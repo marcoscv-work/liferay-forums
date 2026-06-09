@@ -20,7 +20,7 @@
 			"required": false
 		}
 	],
-	"scope": "site",
+	"scope": "company",
 	"portlet": false,
 	"modifiable": true,
 	"parameterRequired": false,

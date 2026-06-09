@@ -3,7 +3,6 @@ var messageList = fragmentElement.querySelector('#forumsMessageList');
 
 if (messageList) {
 	var portalURL = Liferay.ThemeDisplay.getPortalURL();
-	var scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
 	var headers = {
 		'Accept': 'application/json',
 		'Content-Type': 'application/json'
@@ -99,7 +98,7 @@ if (messageList) {
 
 	/* Populate category filter dropdown */
 	if (categoryFilter) {
-		Liferay.Util.fetch(portalURL + '/o/c/forumcategories/scopes/' + scopeGroupId + '?pageSize=200&sort=categoryName:asc', {
+		Liferay.Util.fetch(portalURL + '/o/c/forumcategories?pageSize=200&sort=categoryName:asc', {
 			headers: headers,
 			method: 'GET'
 		})
@@ -166,7 +165,7 @@ if (messageList) {
 			filterParts.push('r_categoryMessages_c_forumCategoryId eq \'' + categoryId + '\'');
 		}
 
-		var url = portalURL + '/o/c/forummessages/scopes/' + scopeGroupId + '?page=' + currentPage
+		var url = portalURL + '/o/c/forummessages?page=' + currentPage
 			+ '&pageSize=' + pageSize
 			+ '&sort=' + currentSort;
 
@@ -211,13 +210,13 @@ if (messageList) {
 
 			return Promise.all([
 				Liferay.Util.fetch(
-					portalURL + '/o/c/forumreplies/scopes/' + scopeGroupId
+					portalURL + '/o/c/forumreplies'
 						+ '?filter=' + encodeURIComponent(repliesFilter)
 						+ '&pageSize=500&sort=dateCreated:asc',
 					{ headers: headers, method: 'GET' }
 				).then(function(r) { return r.json(); }).catch(function() { return { items: [] }; }),
 				Liferay.Util.fetch(
-					portalURL + '/o/c/forumsuspiciousactivities/scopes/' + scopeGroupId
+					portalURL + '/o/c/forumsuspiciousactivities'
 						+ '?filter=' + encodeURIComponent(activitiesFilter)
 						+ '&pageSize=500',
 					{ headers: headers, method: 'GET' }
@@ -296,7 +295,15 @@ if (messageList) {
 					solvedBadge = '<span class="forums-message-card__solved text-success font-weight-semi-bold ml-2">' + checkIcon + ' ' + solvedText + '</span>';
 				}
 
-				var siteSlug = (msg.scopeKey || '').toLowerCase().replace(/ /g, '-');
+				var siteSlug = (function() {
+					var pubPath = Liferay.ThemeDisplay.getPathFriendlyURLPublic() + '/';
+					if (window.location.pathname.indexOf(pubPath) === 0) {
+						var r = window.location.pathname.substring(pubPath.length);
+						var e = r.indexOf('/');
+						return e === -1 ? r : r.substring(0, e);
+					}
+					return '';
+				})();
 				var messageObjectRoute = configuration.messageObjectRoute || 'c_forummessage';
 				var topicHref = msg.friendlyUrlPath
 					? Liferay.ThemeDisplay.getPathFriendlyURLPublic() + '/' + siteSlug + '/' + messageObjectRoute + '/' + msg.friendlyUrlPath
@@ -587,7 +594,7 @@ if (messageList) {
 
 	/* Initial load */
 	if (Liferay.ThemeDisplay.isSignedIn()) {
-		Liferay.Util.fetch(portalURL + '/o/c/forumbans/scopes/' + scopeGroupId + '?filter=' + encodeURIComponent('banUserId eq ' + currentUserId) + '&pageSize=1', {
+		Liferay.Util.fetch(portalURL + '/o/c/forumbans?filter=' + encodeURIComponent('banUserId eq ' + currentUserId) + '&pageSize=1', {
 			headers: headers,
 			method: 'GET'
 		})

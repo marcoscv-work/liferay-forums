@@ -9,6 +9,13 @@
 					"label": "Message Object URL Route",
 					"name": "messageObjectRoute",
 					"type": "text"
+				},
+				{
+					"dataType": "string",
+					"defaultValue": "/forum-example-site",
+					"label": "Messages Site Friendly URL",
+					"name": "messagesSiteFriendlyURL",
+					"type": "text"
 				}
 			]
 		}

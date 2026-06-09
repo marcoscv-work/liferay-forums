@@ -3,7 +3,6 @@ var forumsMod = fragmentElement.querySelector('#forumsModeration');
 
 if (forumsMod) {
 	var portalURL = Liferay.ThemeDisplay.getPortalURL();
-	var scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
 	var headers = {
 		'Accept': 'application/json',
 		'Content-Type': 'application/json'
@@ -11,9 +10,9 @@ if (forumsMod) {
 
 	function buildMessageHref(messageData) {
 		if (messageData && messageData.friendlyUrlPath) {
-			var siteSlug = (messageData.scopeKey || '').toLowerCase().replace(/ /g, '-');
+			var messagesSiteFriendlyURL = configuration.messagesSiteFriendlyURL || '/forum-example-site';
 			var messageObjectRoute = configuration.messageObjectRoute || 'c_forummessage';
-			return Liferay.ThemeDisplay.getPathFriendlyURLPublic() + '/' + siteSlug + '/' + messageObjectRoute + '/' + messageData.friendlyUrlPath;
+			return Liferay.ThemeDisplay.getPathFriendlyURLPublic() + messagesSiteFriendlyURL + '/' + messageObjectRoute + '/' + messageData.friendlyUrlPath;
 		}
 		return null;
 	}
@@ -197,7 +196,7 @@ if (forumsMod) {
 		flagList.innerHTML = '';
 		if (paginationNav) paginationNav.style.display = 'none';
 
-		var url = portalURL + '/o/c/forumbans/scopes/' + scopeGroupId
+		var url = portalURL + '/o/c/forumbans'
 			+ '?sort=dateCreated:desc'
 			+ '&page=' + currentPage
 			+ '&pageSize=' + pageSize;
@@ -269,7 +268,7 @@ if (forumsMod) {
 		flagList.innerHTML = '';
 		if (paginationNav) paginationNav.style.display = 'none';
 
-		var url = portalURL + '/o/c/forumsuspiciousactivities/scopes/' + scopeGroupId
+		var url = portalURL + '/o/c/forumsuspiciousactivities'
 			+ '?nestedFields=messageSuspiciousActivities'
 			+ '&sort=dateCreated:desc'
 			+ '&page=' + currentPage
@@ -430,7 +429,7 @@ if (forumsMod) {
 						var message = forumsMod.dataset.labelConfirmBanUser || 'Are you sure you want to ban this user?';
 						showConfirmModal(message, forumsMod.dataset.labelBanAuthor || 'Ban Author', function() {
 							banBtn.disabled = true;
-							Liferay.Util.fetch(portalURL + '/o/c/forumbans/scopes/' + scopeGroupId, {
+							Liferay.Util.fetch(portalURL + '/o/c/forumbans', {
 								headers: headers,
 								method: 'POST',
 								body: JSON.stringify({ banUserId: parseInt(authorId) })

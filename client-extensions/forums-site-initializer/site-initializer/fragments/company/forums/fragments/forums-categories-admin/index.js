@@ -3,7 +3,6 @@ var forumsCategoriesAdmin = fragmentElement.querySelector('#forumsCategoriesAdmi
 
 if (forumsCategoriesAdmin) {
 	var portalURL = Liferay.ThemeDisplay.getPortalURL();
-	var scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
 	var clayIconsUrl = Liferay.ThemeDisplay.getPathThemeImages() + '/clay/icons.svg';
 	var headers = {
 		'Accept': 'application/json',
@@ -38,7 +37,7 @@ if (forumsCategoriesAdmin) {
 		if (loadingEl) loadingEl.style.display = 'block';
 		listEl.innerHTML = '';
 
-		Liferay.Util.fetch(portalURL + '/o/c/forumcategories/scopes/' + scopeGroupId + '?pageSize=100&sort=categoryName:asc', {
+		Liferay.Util.fetch(portalURL + '/o/c/forumcategories?pageSize=100&sort=categoryName:asc', {
 			headers: headers,
 			method: 'GET'
 		})
@@ -229,7 +228,7 @@ if (forumsCategoriesAdmin) {
 		};
 		if (erc) body.externalReferenceCode = erc;
 
-		return Liferay.Util.fetch(portalURL + '/o/c/forumcategories/scopes/' + scopeGroupId, {
+		return Liferay.Util.fetch(portalURL + '/o/c/forumcategories', {
 			headers: headers,
 			method: 'POST',
 			body: JSON.stringify(body)

@@ -3,7 +3,6 @@ var messageDetail = fragmentElement.querySelector('#forumsMessageDetail');
 
 if (messageDetail) {
 	var portalURL = Liferay.ThemeDisplay.getPortalURL();
-	var scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
 	var pathFriendlyURLPublic = Liferay.ThemeDisplay.getPathFriendlyURLPublic();
 	var sitePrefix = '';
 	if (pathFriendlyURLPublic) {
@@ -321,7 +320,7 @@ if (messageDetail) {
 		if (!Liferay.ThemeDisplay.isSignedIn()) { callback(); return; }
 		/* Filter by current user's ID to only get this user's votes */
 		var filterParam = encodeURIComponent('creatorId eq ' + currentUserId);
-		Liferay.Util.fetch(portalURL + '/o/c/forumvotes/scopes/' + scopeGroupId + '?filter=' + filterParam + '&pageSize=200', {
+		Liferay.Util.fetch(portalURL + '/o/c/forumvotes?filter=' + filterParam + '&pageSize=200', {
 			headers: headers,
 			method: 'GET'
 		})
@@ -393,7 +392,7 @@ if (messageDetail) {
 	}
 
 	function createVote(messageId, voteValue) {
-		return Liferay.Util.fetch(portalURL + '/o/c/forumvotes/scopes/' + scopeGroupId, {
+		return Liferay.Util.fetch(portalURL + '/o/c/forumvotes', {
 			headers: headers,
 			method: 'POST',
 			body: JSON.stringify({
@@ -877,7 +876,7 @@ if (messageDetail) {
 
 		/* Check if the current user has already flagged this message (dedup) */
 		if (flagBtn && currentUserId) {
-			Liferay.Util.fetch(portalURL + '/o/c/forumsuspiciousactivities/scopes/' + scopeGroupId + '?filter='
+			Liferay.Util.fetch(portalURL + '/o/c/forumsuspiciousactivities?filter='
 				+ encodeURIComponent('creatorId eq ' + currentUserId + ' and suspiciousMessageId eq ' + messageId)
 				+ '&pageSize=1', {
 				headers: headers,
@@ -915,7 +914,7 @@ if (messageDetail) {
 			skeletonShownAt = Date.now();
 		}
 
-		Liferay.Util.fetch(portalURL + '/o/c/forumreplies/scopes/' + scopeGroupId + '?filter='
+		Liferay.Util.fetch(portalURL + '/o/c/forumreplies?filter='
 			+ encodeURIComponent('r_messageReplies_c_forumMessageId eq \'' + messageId + '\'')
 			+ '&sort=dateCreated:asc&page=' + currentReplyPage
 			+ '&pageSize=' + replyPageSize, {
@@ -1367,7 +1366,7 @@ if (messageDetail) {
 					flagMethod = 'PATCH';
 					flagBody = JSON.stringify({ reason: reason });
 				} else {
-					flagUrl = portalURL + '/o/c/forumsuspiciousactivities/scopes/' + scopeGroupId;
+					flagUrl = portalURL + '/o/c/forumsuspiciousactivities';
 					flagMethod = 'POST';
 					flagBody = JSON.stringify({
 						reason: reason,
@@ -1422,7 +1421,7 @@ if (messageDetail) {
 	}
 
 	if (Liferay.ThemeDisplay.isSignedIn()) {
-		Liferay.Util.fetch(portalURL + '/o/c/forumbans/scopes/' + scopeGroupId + '?filter=' + encodeURIComponent('banUserId eq ' + currentUserId) + '&pageSize=1', {
+		Liferay.Util.fetch(portalURL + '/o/c/forumbans?filter=' + encodeURIComponent('banUserId eq ' + currentUserId) + '&pageSize=1', {
 			headers: headers,
 			method: 'GET'
 		})
@@ -1453,7 +1452,7 @@ if (messageDetail) {
 		if (replyErc === 'Mappable Reply ERC') replyErc = null;
 
 		if (replyErc) {
-			Liferay.Util.fetch(portalURL + '/o/c/forumreplies/scopes/' + scopeGroupId + '/by-external-reference-code/' + encodeURIComponent(replyErc), {
+			Liferay.Util.fetch(portalURL + '/o/c/forumreplies/by-external-reference-code/' + encodeURIComponent(replyErc), {
 				headers: headers,
 				method: 'GET'
 			})
@@ -1474,7 +1473,7 @@ if (messageDetail) {
 			if (!erc) {
 				if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty text-secondary text-center py-5">' + (messageDetail.dataset.labelErcNotMapped || 'Message ERC is not mapped.') + '</div>';
 			} else {
-				Liferay.Util.fetch(portalURL + '/o/c/forummessages/scopes/' + scopeGroupId + '/by-external-reference-code/' + encodeURIComponent(erc), {
+				Liferay.Util.fetch(portalURL + '/o/c/forummessages/by-external-reference-code/' + encodeURIComponent(erc), {
 					headers: headers,
 					method: 'GET'
 				})

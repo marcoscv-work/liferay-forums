@@ -3,7 +3,6 @@ var relatedTopics = fragmentElement.querySelector('#forumsRelatedTopics');
 
 if (relatedTopics && !document.body.classList.contains('has-edit-mode-menu')) {
 	var portalURL = Liferay.ThemeDisplay.getPortalURL();
-	var scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
 	var headers = {
 		'Accept': 'application/json',
 		'Content-Type': 'application/json'
@@ -40,7 +39,7 @@ if (relatedTopics && !document.body.classList.contains('has-edit-mode-menu')) {
 			filterParts.push('r_categoryMessages_c_forumCategoryId eq \'' + categoryId + '\'');
 		}
 
-		var url = portalURL + '/o/c/forummessages/scopes/' + scopeGroupId + '?pageSize=6&sort=lastPostDate:desc&nestedFields=messageSuspiciousActivities';
+		var url = portalURL + '/o/c/forummessages?pageSize=6&sort=lastPostDate:desc&nestedFields=messageSuspiciousActivities';
 		if (filterParts.length > 0) {
 			url += '&filter=' + encodeURIComponent(filterParts.join(' and '));
 		}
@@ -80,7 +79,15 @@ if (relatedTopics && !document.body.classList.contains('has-edit-mode-menu')) {
 			}
 
 			if (msg.friendlyUrlPath) {
-				var siteSlug = (msg.scopeKey || '').toLowerCase().replace(/ /g, '-');
+				var siteSlug = (function() {
+					var pubPath = Liferay.ThemeDisplay.getPathFriendlyURLPublic() + '/';
+					if (window.location.pathname.indexOf(pubPath) === 0) {
+						var r = window.location.pathname.substring(pubPath.length);
+						var e = r.indexOf('/');
+						return e === -1 ? r : r.substring(0, e);
+					}
+					return '';
+				})();
 				var messageObjectRoute = configuration.messageObjectRoute || 'c_forummessage';
 				var messageHref = Liferay.ThemeDisplay.getPathFriendlyURLPublic() + '/' + siteSlug + '/' + messageObjectRoute + '/' + msg.friendlyUrlPath;
 				html += '<a href="' + messageHref + '" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">'
@@ -118,7 +125,7 @@ if (relatedTopics && !document.body.classList.contains('has-edit-mode-menu')) {
 		if (replyErc === 'Mappable Reply ERC') replyErc = null;
 
 		if (replyErc) {
-			Liferay.Util.fetch(portalURL + '/o/c/forumreplies/scopes/' + scopeGroupId + '/by-external-reference-code/' + encodeURIComponent(replyErc), {
+			Liferay.Util.fetch(portalURL + '/o/c/forumreplies/by-external-reference-code/' + encodeURIComponent(replyErc), {
 				headers: headers,
 				method: 'GET'
 			})
@@ -140,7 +147,7 @@ if (relatedTopics && !document.body.classList.contains('has-edit-mode-menu')) {
 				if (loadingEl) loadingEl.remove();
 				listEl.innerHTML = '<div class="text-secondary text-center py-2">' + (relatedTopics.dataset.labelErcNotMapped || 'Message ERC is not mapped.') + '</div>';
 			} else {
-				Liferay.Util.fetch(portalURL + '/o/c/forummessages/scopes/' + scopeGroupId + '/by-external-reference-code/' + encodeURIComponent(erc), {
+				Liferay.Util.fetch(portalURL + '/o/c/forummessages/by-external-reference-code/' + encodeURIComponent(erc), {
 					headers: headers,
 					method: 'GET'
 				})
