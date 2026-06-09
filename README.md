@@ -2,6 +2,13 @@
 
 This Liferay Workspace project is a Fragments and Liferay Objects based replacement for the legacy Message Boards / Questions widgets which are deprecated.
 
+The project is delivered as **two site initializers** that build two sites with a clear separation of concerns:
+
+- **Forum Example Site** (`forums-site-initializer`) — the public, end-user experience: the forums home, the discussions list, thread display pages and the New Discussion page. It runs on the Classic theme.
+- **Forums Admin** (`forums-admin-site-initializer`) — the administration experience (category management and moderation), presented like a standalone product using the same shell and styling as **Liferay CMS** (a left product menu, a top product bar with the application switcher, and the CMS theme).
+
+Both sites share the same data because the Forum Objects are **company-scoped**: a single dataset is administered from Forums Admin and surfaced on the Forum Example Site. See [Two-Site Architecture](#two-site-architecture) below.
+
 ---
 
 ## Screenshots
@@ -23,14 +30,25 @@ This Liferay Workspace project is a Fragments and Liferay Objects based replacem
 
 ## Setup
 
-The main artifact of this project is a Liferay site initializer. Before building it, the following lines in `client-extensions/forums-site-initializer/client-extension.yaml` should be changed in order to specify the site where things should be created:
+The project produces **two** site-initializer client extensions under `client-extensions/`:
+
+| Client extension | Site ERC | Site name | Friendly URL |
+| :--- | :--- | :--- | :--- |
+| `forums-site-initializer` | `FORUMS` | `Forum Example Site` | `/forum-example-site` |
+| `forums-admin-site-initializer` | `FORUMSADMIN` | `Forums Admin` | `/forums-admin` |
+
+The site ERC, name and other values can be changed in each extension's `client-extension.yaml`:
 
 ```yaml
     siteExternalReferenceCode: FORUMS
-    siteName: Forums
+    siteName: Forum Example Site
 ```
 
-You can then build it using the standard Liferay Workspace wrapper commands (e.g., `./gw build`) and deploy it by copying the resulting artifact to `$LIFERAY_HOME/deploy`.
+Build them with the standard Liferay Workspace wrapper commands (e.g., `./gw build`) and deploy each by copying the resulting artifact to `$LIFERAY_HOME/deploy`.
+
+> **Deploy order matters.** The Forums Admin site composes the shared, company-scoped fragments (the admin fragments and the CMS-style chrome) that are imported by `forums-site-initializer`. Deploy `forums-site-initializer` **first** so those fragments exist when the admin site initializes.
+
+> **Note on renaming.** Renaming a site changes its auto-derived group friendly URL (renaming to "Forum Example Site" yields `/forum-example-site`). Account for this if you hardcode links; the fragments themselves derive the site path at runtime.
 
 | File | Description |
 | :--- | :--- |
@@ -50,37 +68,87 @@ The following **Release** feature flags must be enabled before deploying.
 
 ---
 
+## Two-Site Architecture
+
+Administration is separated from the public experience into two sites, following the pattern Liferay CMS uses to present a site as a standalone admin product.
+
+```
+Forum Example Site (/forum-example-site)        Forums Admin (/forums-admin)
+Classic theme, end users                         CMS theme, administrators
+├── Forums            (home)                     ├── Categories   (manage categories)
+├── Forums Messages   (discussions list)         └── Moderation   (review flagged content)
+└── New Discussion    (hidden)
+    + ForumMessage / ForumReply display pages
+```
+
+### Company-scoped data model
+
+All nine Forum Object definitions use **company** scope (not site). With company scope the generated REST endpoints have **no** `/scopes/{groupId}` segment — entries are read and written at `/o/c/<object>` (e.g. `/o/c/forumcategories`). This is what lets a single dataset be administered on Forums Admin and rendered on the Forum Example Site.
+
+Consequences worth knowing:
+
+- Fragment calls (both client-side `fetch` and server-side FreeMarker `restClient.get`) use `/o/c/<object>`, never `/o/c/<object>/scopes/...`.
+- Object scope is **immutable on a published definition**. Changing it requires deleting the object relationships and definitions (and their data) and re-initializing.
+- Because the data is company-wide, it **survives deleting and recreating either site**, so iterating on a site no longer wipes forum content.
+- Links to an object's display page derive the site path from the **current page URL** (the moderation fragment, which runs on Forums Admin where the display page does not exist, instead targets the example site via its **Messages Site Friendly URL** configuration field).
+
+### CMS-style admin shell
+
+`forums-admin-site-initializer` reproduces the CMS product look with declarative artifacts only:
+
+- **CMS theme** (`layout-set/public/metadata.json` → `"themeName": "CMS"`) and a hidden control menu (`site-configuration.json`).
+- A **master page** (`forums-admin-master`) that composes four chrome fragments — `sidebar` (the CSS-grid shell), `page-bar` (top bar with the waffle logo, product title, application switcher and user bar), `sidebar-trigger` (hamburger) and `vertical-navigation` (the left menu, bound to the `FORUMSADMINNAV` site navigation menu) — around a content drop zone.
+- Pages (`Categories`, `Moderation`) that embed the shared `forums-categories-admin` and `forums-moderation` fragments.
+
+The chrome fragments live in the shared **company** fragment collection owned by `forums-site-initializer`, so they are referenced by key alone from the admin master page.
+
+---
+
 ## Fragments
+
+The fragments live in the shared company collection owned by `forums-site-initializer` (`site-initializer/fragments/company/forums/fragments/`).
+
+### Forum fragments
 
 | Fragment Name | Folder | Description |
 | :--- | :--- | :--- |
-| **Forums Categories Admin** | [forums-categories-admin](fragments/forums-categories-admin) | Administration interface for managing forum categories. |
+| **Forums Categories Admin** | [forums-categories-admin](fragments/forums-categories-admin) | Administration interface for managing forum categories. Placed on the **Forums Admin** site. |
 | **Forums Category Grid** | [forums-category-grid](fragments/forums-category-grid) | Displays the main forum categories in a grid layout. |
 | **Forums Hero** | [forums-hero](fragments/forums-hero) | Top banner for the forums featuring statistics (like member count) and quick actions. |
-| **Forums Moderation** | [forums-moderation](fragments/forums-moderation) | Tools for moderating forum content. |
-| **Forums Message Composer** | [forums-message-composer](fragments/forums-message-composer) | Modal composer for creating and editing forum messages and replies. |
+| **Forums Moderation** | [forums-moderation](fragments/forums-moderation) | Tools for moderating forum content. Placed on the **Forums Admin** site. |
+| **Forums Message Composer** | [forums-message-composer](fragments/forums-message-composer) | Composer for creating and editing forum messages and replies. Supports two `Form Mode`s: **modal** (replies/edits on the thread page) and **page** (the standalone New Discussion page). |
 | **Forums Related Topics** | [forums-related-topics](fragments/forums-related-topics) | Displays a list of topics related to the currently viewed message. |
 | **Forums Message Detail** | [forums-message-detail](fragments/forums-message-detail) | Detailed view of a single forum message, including its replies and engagement metrics. |
 | **Forums Message List** | [forums-message-list](fragments/forums-message-list) | Lists forum messages, typically used for main category views or recent activity. |
+
+### CMS-style chrome fragments
+
+These power the Forums Admin product shell and are adapted from the Liferay CMS site initializer.
+
+| Fragment Name | Folder | Description |
+| :--- | :--- | :--- |
+| **Page Bar** | [page-bar](fragments/page-bar) | Top product bar: waffle logo, product title, the Product Navigation Applications Menu portlet (application switcher) and the user personal bar. |
+| **Sidebar** | [sidebar](fragments/sidebar) | The collapsible CSS-grid shell (left rail + content area) with the `topBar`, `sidebarBody` and `content` drop zones. |
+| **Sidebar Trigger** | [sidebar-trigger](fragments/sidebar-trigger) | The hamburger button that collapses/expands the rail. |
+| **Vertical Navigation** | [vertical-navigation](fragments/vertical-navigation) | Renders a site navigation menu as a Clay `menubar-primary` nav. Rendered entirely server-side (no React), so it needs no client bundling. |
 
 ---
 
 ## Page Layout and Fragment Placement
 
-The forums application is assembled using a combination of standard pages and Display Page Templates. The site initializer creates the standard pages described below automatically — they are defined in `site-initializer/layouts/`. The layout diagrams serve as a preview of how the fragments are arranged on those auto-created pages.
+The forums application is assembled using standard pages and Display Page Templates. Each site initializer creates its own pages automatically — defined in `site-initializer/layouts/`. Layout directories are numeric-prefixed (`01_`, `02_`, …) so ordering is deterministic and the first page is the site's default landing page. The diagrams below preview how the fragments are arranged.
 
 ```
-/
-├── Forum Categories Admin   (hidden from navigation) †
-├── Forums                   (visible)
-├── Forums Messages          (hidden from navigation)
-└── Forums Moderation        (hidden from navigation) †
+Forum Example Site  (/forum-example-site)        Forums Admin  (/forums-admin)
+├── Forums            /forums          (home)    ├── Categories   /categories
+├── Forums Messages   /forums-messages           └── Moderation   /moderation
+└── New Discussion    /new-discussion  (hidden)
 ```
 
-† Must be ***manually restricted to Site Administrator*** by the Site Administrator after import, as page permissions cannot be set in a site initializer.
+> The Forums Admin pages live on a dedicated administration site, so they are naturally separated from end users. You may still want to ***restrict the Forums Admin site membership/visibility*** to administrators, as site/page permissions cannot be set in a site initializer.
 
-### Page: Forums
-*Friendly URL: `/forums` — Main entry point for the forums.*
+### Forum Example Site — Page: Forums
+*Friendly URL: `/forums` — Main entry point and default landing page.*
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  forums-hero                                                    │
@@ -94,26 +162,40 @@ The forums application is assembled using a combination of standard pages and Di
 
 > The **Search Bar** widget is automatically present in the `forums-hero` drop-zone. ***Edit its configuration*** to specify the destination search page friendly URL (e.g. `/search`) and any other relevant search settings (scope, placeholder text, etc.).
 
-### Page: Forums Messages
-*Friendly URL: `/forums-messages` — Hide from page navigation.*
+### Forum Example Site — Page: Forums Messages
+*Friendly URL: `/forums-messages` — The discussions list. Hidden from navigation.*
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  forums-message-list                                            │
-├─────────────────────────────────────────────────────────────────┤
-│  forums-message-composer                                        │
+│  Fixed-width container (container-fluid-max-xl)                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  forums-message-list                                      │  │
+│  └───────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Page: Forum Categories Admin
-*Friendly URL: `/forum-categories-admin` — Restrict access to the Administrator role.*
+### Forum Example Site — Page: New Discussion
+*Friendly URL: `/new-discussion` — Hidden. The composer in **page** mode.*
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Fixed-width container (container-fluid-max-xl)                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  forums-message-composer  (Form Mode = page)              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+> The "New Discussion" actions in the hero and the message list link here. Cancel goes back; a successful post redirects to the new thread's display page.
+
+### Forums Admin — Page: Categories
+*Friendly URL: `/categories` — Rendered inside the CMS-style admin shell.*
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  forums-categories-admin                                        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Page: Forums Moderation
-*Friendly URL: `/forums-moderation` — Restrict access to the Administrator role.*
+### Forums Admin — Page: Moderation
+*Friendly URL: `/moderation` — Rendered inside the CMS-style admin shell.*
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  forums-moderation                                              │
@@ -181,6 +263,8 @@ Each field is mapped to `ObjectEntry_externalReferenceCode` from the `DisplayPag
 
 The `scripts/_02_demo/` directory contains scripts for populating a development environment with forum content. The three scripts are numbered and should be run in order.
 
+> **Company scope caveat.** These scripts predate the move to company-scoped Objects and address entries through `/o/c/<object>/scopes/{siteId}`. With company scope the correct path is `/o/c/<object>` (no `/scopes` segment, no `siteId`). Adjust the scripts accordingly, or seed a few entries directly against the company endpoints.
+
 ### Step 1 — Create demo data
 
 ```bash
@@ -239,7 +323,7 @@ The `forums-message-detail` fragment PATCHes the `viewCount` field on `ForumMess
 
 ### Ban Enforcement Is UI-Only
 
-When a user is banned (a `ForumBan` Object entry exists for their user ID in the site scope), the fragments detect this at page load by querying `GET /o/c/forumbans/scopes/{groupId}?filter=banUserId eq {userId}`. If a ban is found, the UI is locked down: the submit button is disabled, compose buttons are hidden, and an inline warning is shown. This is purely client-side — the REST endpoints that create and update content (`POST /o/c/forummessages/`, `POST /o/c/forumreplies/`, `PATCH /o/c/forummessages/{id}`, `PATCH /o/c/forumreplies/{id}`) have no knowledge of the `ForumBan` collection and will accept requests from a banned user if called directly.
+When a user is banned (a `ForumBan` Object entry exists for their user ID), the fragments detect this at page load by querying `GET /o/c/forumbans?filter=banUserId eq {userId}`. If a ban is found, the UI is locked down: the submit button is disabled, compose buttons are hidden, and an inline warning is shown. This is purely client-side — the REST endpoints that create and update content (`POST /o/c/forummessages`, `POST /o/c/forumreplies`, `PATCH /o/c/forummessages/{id}`, `PATCH /o/c/forumreplies/{id}`) have no knowledge of the `ForumBan` collection and will accept requests from a banned user if called directly.
 
 **Why the legacy portlets don't have this gap:** The legacy Message Boards portlets enforce bans at the Liferay permission framework layer (`MBPortletResourcePermissionLogic`), which calls `MBBanLocalService.hasBan()` on every permission check regardless of the calling path (web UI, REST API, or direct service invocation). Custom Liferay Objects have no equivalent hook into that permission logic.
 
@@ -250,7 +334,7 @@ When a user is banned (a `ForumBan` Object entry exists for their user ID in the
 A Spring Boot Microservice Client Extension can be registered as an Object Action webhook on both `ForumMessage` and `ForumReply`, triggered on the `On After Add` event. It would:
 
 1. Receive the Object Action payload, which includes the `creatorId` (the user ID of the entry author) and the `groupId` (site scope).
-2. Call `GET /o/c/forumbans/scopes/{groupId}?filter=banUserId eq {creatorId}&pageSize=1` using service credentials to check for a ban record.
+2. Call `GET /o/c/forumbans?filter=banUserId eq {creatorId}&pageSize=1` using service credentials to check for a ban record.
 3. If a ban record exists, immediately call `DELETE /o/c/forummessages/{entryId}` or `DELETE /o/c/forumreplies/{entryId}` to remove the entry.
 
 There is an unavoidable brief window (milliseconds to low seconds depending on load) between the entry being created and the microservice deleting it. In practice this is acceptable given that banning is rare and the moderation fragment provides a backstop for any content that appears during that window.
