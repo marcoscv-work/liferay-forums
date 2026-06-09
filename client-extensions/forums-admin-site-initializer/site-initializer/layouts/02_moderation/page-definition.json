@@ -1,0 +1,33 @@
+{
+	"pageElement": {
+		"pageElements": [
+			{
+				"definition": {
+					"indexed": true,
+					"layout": {}
+				},
+				"pageElements": [
+					{
+						"definition": {
+							"fragment": {
+								"key": "forums-moderation"
+							},
+							"fragmentConfig": {},
+							"fragmentFields": [],
+							"indexed": true
+						},
+						"type": "Fragment"
+					}
+				],
+				"type": "Section"
+			}
+		],
+		"type": "Root"
+	},
+	"settings": {
+		"masterPage": {
+			"key": "forums-admin-master"
+		}
+	},
+	"version": 1.1
+}
