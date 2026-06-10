@@ -103,7 +103,7 @@ if (messageDetail) {
 	var targetReplyId = replyId || null;
 	var skeletonShownAt = Date.now();
 	if (!messageId) {
-		if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty">' + (messageDetail.dataset.labelNoMessage || 'No message selected.') + '</div>';
+		if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty text-secondary text-center py-5">' + (messageDetail.dataset.labelNoMessage || 'No message selected.') + '</div>';
 		return;
 	}
 
@@ -160,13 +160,22 @@ if (messageDetail) {
 		return (family && family !== 'User') ? (given + ' ' + family) : (given || creator.name || '');
 	}
 
+	/* Stable avatar color from the Clay sticker-outline-0..9 palette */
+	function avatarColorClass(creator) {
+		var key = String((creator && (creator.id || creator.name)) || '');
+		var n = 0;
+		for (var i = 0; i < key.length; i++) { n = (n + key.charCodeAt(i)) % 10; }
+		return 'sticker-outline-' + n;
+	}
+
 	function renderAvatar(creator, size) {
-		var cls = size === 'sm' ? 'forums-message-detail__reply-avatar' : 'forums-message-detail__author-avatar';
+		var sizeClass = size === 'sm' ? 'sticker-sm' : 'sticker-lg';
+		var cls = 'sticker sticker-circle ' + sizeClass + ' ' + avatarColorClass(creator);
 		if (creator && creator.image) {
-			return '<div class="' + cls + '"><img src="' + Liferay.Util.escapeHTML(creator.image) + '" alt="' + Liferay.Util.escapeHTML(displayName(creator)) + '"></div>';
+			return '<span class="' + cls + '"><span class="sticker-overlay"><img class="sticker-img" src="' + Liferay.Util.escapeHTML(creator.image) + '" alt="' + Liferay.Util.escapeHTML(displayName(creator)) + '"></span></span>';
 		}
 		var name = displayName(creator);
-		return '<div class="' + cls + '">' + avatarInitial(name) + '</div>';
+		return '<span class="' + cls + '"><span class="sticker-overlay">' + avatarInitial(name) + '</span></span>';
 	}
 
 	/* Vote state: maps messageId -> { voteId, voteValue } for current user */
@@ -192,7 +201,6 @@ if (messageDetail) {
 		var date = formatDate(msg.dateCreated);
 		var score = msg.voteScore || 0;
 		var solClass = isSolution ? ' forums-message-detail__reply-card--solution' : '';
-		var depthClass = depth > 0 ? ' forums-message-detail__reply-card--nested' : '';
 		var depthStyle = depth > 0 ? ' style="margin-left:' + (depth * 2.5) + 'rem"' : '';
 		var userVote = userVoteMap[msg.id];
 		var upActive = userVote && userVote.voteValue === 1 ? ' active' : '';
@@ -207,37 +215,36 @@ if (messageDetail) {
 		var replyBtnSpacerClass = (hasEditAction || hasDeleteAction) ? ' mr-2' : '';
 		var editBtnSpacerClass = hasDeleteAction ? ' mr-2' : '';
 		var canMarkAnswer = isMessageQuestion && (canUpdateMessage || (opCreatorId && String(opCreatorId) === String(currentUserId))) && depth === 0;
+		var isAuthor = opCreatorId && String(creator.id) === String(opCreatorId);
 
-		return `<div class="forums-message-detail__reply-card${solClass}${depthClass}" data-message-id="${msg.id}"${depthStyle}>
-			<div class="forums-message-detail__reply-layout">
-				<div class="align-items-center d-inline-flex justify-content-start text-secondary mr-3 forums-vote" data-message-id="${msg.id}">
-					<button class="btn-thumbs-up btn btn-outline-borderless btn-sm btn-outline-secondary forums-vote__btn forums-vote__btn--up${upActive}" type="button" aria-pressed="${isUpPressed}"${canVote ? ` data-vote-dir="up" data-message-id="${msg.id}"` : ' disabled'} title="Upvote">
-						<span class="inline-item inline-item-before">
-							<svg class="lexicon-icon lexicon-icon-${upIcon}" role="presentation"><use href="${clayIconsUrl}#${upIcon}"></use></svg>
-						</span>
-					</button>
-					<span class="font-weight-bold p-1 forums-vote__score" data-vote-score="${msg.id}">${score}</span>
-					<button class="btn-thumbs-down btn btn-outline-borderless btn-sm btn-outline-secondary forums-vote__btn forums-vote__btn--down${downActive}" type="button" aria-pressed="${isDownPressed}"${canVote ? ` data-vote-dir="down" data-message-id="${msg.id}"` : ' disabled'} title="Downvote">
-						<span class="inline-item inline-item-before">
-							<svg class="lexicon-icon lexicon-icon-${downIcon}" role="presentation"><use href="${clayIconsUrl}#${downIcon}"></use></svg>
-						</span>
-					</button>
+		return `<div class="forums-message-detail__reply-card${solClass}" data-message-id="${msg.id}"${depthStyle}>
+			<div class="autofit-row forums-message-detail__reply-layout">
+				<div class="autofit-col mr-2">
+					${renderAvatar(creator, 'sm')}
 				</div>
-				<div class="forums-message-detail__reply-content">
-					${isSolution ? `<span class="forums-vote__accepted-badge">&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}</span>` : ''}
+				<div class="autofit-col autofit-col-expand forums-message-detail__reply-content">
+					<div class="forums-message-detail__reply-header">
+						<span class="text-dark font-weight-bold">${Liferay.Util.escapeHTML(name)}</span>
+						${isAuthor ? `<span class="label label-info">${messageDetail.dataset.labelAuthor || 'Author'}</span>` : ''}
+						<span class="text-secondary small">${date}</span>
+					</div>
+					${isSolution ? `<span class="label label-success forums-vote__accepted-badge mb-2">&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}</span>` : ''}
 					<div class="forums-message-detail__reply-body">${body}</div>
-					<div class="forums-message-detail__reply-author">
-						<div class="forums-message-detail__reply-author-info">
-							${renderAvatar(creator, 'sm')}
-							<span class="forums-message-detail__reply-name">${Liferay.Util.escapeHTML(name)}</span>
-							<span class="forums-message-detail__reply-date">${date}</span>
+					<div class="forums-message-detail__reply-actions">
+						${canReply ? `<button class="btn btn-outline-secondary btn-sm" type="button" data-forums-compose data-forums-reply data-forums-message-id="${msg.r_messageReplies_c_forumMessageId}" data-forums-parent-id="${msg.id}"><span class="inline-item inline-item-before"><svg class="lexicon-icon lexicon-icon-reply" role="presentation"><use href="${clayIconsUrl}#reply"></use></svg></span>${messageDetail.dataset.labelReply || 'Reply'}</button>` : ''}
+						<div class="align-items-center d-inline-flex text-secondary forums-vote" data-message-id="${msg.id}">
+							<button class="btn-thumbs-up btn btn-outline-borderless btn-sm btn-outline-secondary forums-vote__btn forums-vote__btn--up${upActive}" type="button" aria-pressed="${isUpPressed}"${canVote ? ` data-vote-dir="up" data-message-id="${msg.id}"` : ' disabled'} title="${messageDetail.dataset.labelUpvote || 'Upvote'}">
+								<span class="inline-item inline-item-before"><svg class="lexicon-icon lexicon-icon-${upIcon}" role="presentation"><use href="${clayIconsUrl}#${upIcon}"></use></svg></span>
+							</button>
+							<span class="font-weight-bold p-1 forums-vote__score" data-vote-score="${msg.id}">${score}</span>
+							<button class="btn-thumbs-down btn btn-outline-borderless btn-sm btn-outline-secondary forums-vote__btn forums-vote__btn--down${downActive}" type="button" aria-pressed="${isDownPressed}"${canVote ? ` data-vote-dir="down" data-message-id="${msg.id}"` : ' disabled'} title="${messageDetail.dataset.labelDownvote || 'Downvote'}">
+								<span class="inline-item inline-item-before"><svg class="lexicon-icon lexicon-icon-${downIcon}" role="presentation"><use href="${clayIconsUrl}#${downIcon}"></use></svg></span>
+							</button>
 						</div>
-						<div class="forums-message-detail__reply-actions">
-							${canMarkAnswer ? `<button class="btn btn-sm mr-2 ${isSolution ? 'btn-success' : 'btn-secondary'} forums-answer-btn" data-answer-message-id="${msg.id}" data-is-answer="${isSolution ? 'true' : 'false'}">${isSolution ? `&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}` : (messageDetail.dataset.labelMarkAsAnswer || 'Mark as Answer')}</button>` : ''}
-							${canReply ? `<button class="btn btn-secondary btn-sm${replyBtnSpacerClass}" data-forums-compose data-forums-reply data-forums-message-id="${msg.id}" title="${messageDetail.dataset.labelReply || 'Reply'}" aria-label="${messageDetail.dataset.labelReply || 'Reply'}"><svg class="lexicon-icon lexicon-icon-reply" role="presentation"><use href="${clayIconsUrl}#reply"></use></svg></button>` : ''}
-							${hasEditAction ? `<button class="btn btn-secondary btn-sm forums-edit-reply-btn${editBtnSpacerClass}" data-message-id="${msg.id}" title="${messageDetail.dataset.labelEditReply || 'Edit Reply'}" aria-label="${messageDetail.dataset.labelEditReply || 'Edit Reply'}"><svg class="lexicon-icon lexicon-icon-pencil" role="presentation"><use href="${clayIconsUrl}#pencil"></use></svg></button>` : ''}
-							${hasDeleteAction ? `<button class="btn btn-danger btn-sm forums-delete-btn" data-delete-url="${msg.actions['delete'].href}" title="${messageDetail.dataset.labelDelete || 'Delete'}" aria-label="${messageDetail.dataset.labelDelete || 'Delete'}"><svg class="lexicon-icon lexicon-icon-trash" role="presentation"><use href="${clayIconsUrl}#trash"></use></svg></button>` : ''}
-						</div>
+						<button class="btn btn-unstyled btn-sm forums-share-btn" type="button" data-message-id="${msg.id}"><span class="inline-item inline-item-before"><svg class="lexicon-icon lexicon-icon-link" role="presentation"><use href="${clayIconsUrl}#link"></use></svg></span>${messageDetail.dataset.labelShareLink || 'Share Link'}</button>
+						${canMarkAnswer ? `<button class="btn btn-sm ${isSolution ? 'btn-success' : 'btn-outline-secondary'} forums-answer-btn" data-answer-message-id="${msg.id}" data-is-answer="${isSolution ? 'true' : 'false'}">${isSolution ? `&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}` : (messageDetail.dataset.labelMarkAsAnswer || 'Mark as Answer')}</button>` : ''}
+						${hasEditAction ? `<button class="btn btn-outline-secondary btn-sm forums-edit-reply-btn" data-message-id="${msg.id}" title="${messageDetail.dataset.labelEditReply || 'Edit Reply'}" aria-label="${messageDetail.dataset.labelEditReply || 'Edit Reply'}"><svg class="lexicon-icon lexicon-icon-pencil" role="presentation"><use href="${clayIconsUrl}#pencil"></use></svg></button>` : ''}
+						${hasDeleteAction ? `<button class="btn btn-outline-danger btn-sm forums-delete-btn" data-delete-url="${msg.actions['delete'].href}" title="${messageDetail.dataset.labelDelete || 'Delete'}" aria-label="${messageDetail.dataset.labelDelete || 'Delete'}"><svg class="lexicon-icon lexicon-icon-trash" role="presentation"><use href="${clayIconsUrl}#trash"></use></svg></button>` : ''}
 					</div>
 				</div>
 			</div>
@@ -498,6 +505,21 @@ if (messageDetail) {
 		}
 	}
 
+	function attachShareHandlers() {
+		messageDetail.querySelectorAll('.forums-share-btn').forEach(function(btn) {
+			btn.addEventListener('click', function(e) {
+				e.preventDefault();
+				var url = window.location.href;
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(url).catch(function() {});
+				}
+				if (Liferay.Util && Liferay.Util.openToast) {
+					Liferay.Util.openToast({ message: messageDetail.dataset.labelLinkCopied || 'Link copied to clipboard.', type: 'success' });
+				}
+			});
+		});
+	}
+
 	function attachAnswerHandlers() {
 		messageDetail.querySelectorAll('.forums-answer-btn').forEach(function(btn) {
 			btn.addEventListener('click', function(e) {
@@ -626,7 +648,7 @@ if (messageDetail) {
 								var opSection = messageDetail.querySelector('#forumsDetailOP');
 								if (opSection) opSection.style.opacity = '0.5';
 								var breadcrumbCatEl = messageDetail.querySelector('#forumsDetailBreadcrumbCategory');
-								var messagesBase = sitePrefix + ((typeof configuration !== 'undefined' && configuration.messagesURL) ? configuration.messagesURL : '/forum-messages');
+								var messagesBase = sitePrefix + ((typeof configuration !== 'undefined' && configuration.messagesURL) ? configuration.messagesURL : '/forums-messages');
 								var targetHref = (breadcrumbCatEl && breadcrumbCatEl.href) ? breadcrumbCatEl.href
 									: (messageCategoryFK ? messagesBase + '?categoryId=' + messageCategoryFK : messagesBase);
 								setTimeout(function() {
@@ -834,7 +856,7 @@ if (messageDetail) {
 			.then(function(r) { return r.json(); })
 			.then(function(cat) {
 				var catName = cat.categoryName || messageDetail.dataset.labelCategory || 'Category';
-				var messagesHref = sitePrefix + ((typeof configuration !== 'undefined' && configuration.messagesURL) ? configuration.messagesURL : '/forum-messages');
+				var messagesHref = sitePrefix + ((typeof configuration !== 'undefined' && configuration.messagesURL) ? configuration.messagesURL : '/forums-messages');
 				var catURL = messagesHref + '?categoryId=' + categoryFK;
 
 				if (breadcrumbCategory) {
@@ -878,7 +900,7 @@ if (messageDetail) {
 		loadMessages();
 	})
 	.catch(function(err) {
-		if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty">' + (messageDetail.dataset.labelUnableToLoadMessage || 'Unable to load message.') + '</div>';
+		if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty text-secondary text-center py-5">' + (messageDetail.dataset.labelUnableToLoadMessage || 'Unable to load message.') + '</div>';
 		console.error('ForumsMessageDetail error:', err);
 	});
 	}
@@ -957,10 +979,11 @@ if (messageDetail) {
 					opBody.innerHTML = opMsg.body || '';
 					formatMarkupCodeBlocks(opBody);
 				}
+				if (opAvatar) opAvatar.className = 'sticker sticker-circle sticker-lg ' + avatarColorClass(creator);
 				if (opAvatar && creator.image) {
-					opAvatar.innerHTML = '<img src="' + Liferay.Util.escapeHTML(creator.image) + '" alt="' + Liferay.Util.escapeHTML(displayName(creator)) + '">';
+					opAvatar.innerHTML = '<span class="sticker-overlay"><img class="sticker-img" src="' + Liferay.Util.escapeHTML(creator.image) + '" alt="' + Liferay.Util.escapeHTML(displayName(creator)) + '"></span>';
 				} else if (opAvatar) {
-					opAvatar.textContent = avatarInitial(displayName(creator));
+					opAvatar.innerHTML = '<span class="sticker-overlay">' + Liferay.Util.escapeHTML(avatarInitial(displayName(creator))) + '</span>';
 				}
 				if (opAuthor) opAuthor.textContent = displayName(creator) || messageDetail.dataset.labelUnknown || 'Unknown';
 				if (opDate) {
@@ -975,7 +998,7 @@ if (messageDetail) {
 				/* Render OP Tags */
 				if (opTags && messageTagsArray.length > 0) {
 					var tagsHtml = messageTagsArray.map(function(tag) {
-						return `<span class="label label-secondary forums-message-detail__tag"><span class="label-item label-item-expand">${Liferay.Util.escapeHTML(tag)}</span></span>`;
+						return `<span class="label label-secondary"><span class="label-item label-item-expand">${Liferay.Util.escapeHTML(tag)}</span></span>`;
 					}).join('');
 					opTags.innerHTML = tagsHtml;
 					opTags.style.display = '';
@@ -1164,6 +1187,7 @@ if (messageDetail) {
 			attachAnswerHandlers();
 			attachDeleteHandlers();
 			attachEditReplyHandlers();
+			attachShareHandlers();
 
 			/* Hide skeleton after render, with a minimum display time to prevent flash */
 			if (loadingEl) {
@@ -1221,7 +1245,7 @@ if (messageDetail) {
 			}); /* end fetchUserVotes callback */
 		})
 		.catch(function(err) {
-			if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty">' + (messageDetail.dataset.labelUnableToLoadMessages || 'Unable to load messages.') + '</div>';
+			if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty text-secondary text-center py-5">' + (messageDetail.dataset.labelUnableToLoadMessages || 'Unable to load messages.') + '</div>';
 			console.error('ForumsMessageDetail messages error:', err);
 		});
 	}
@@ -1365,16 +1389,13 @@ if (messageDetail) {
 							flagBtn.textContent = messageDetail.dataset.labelFlagged || 'Flagged';
 							flagBtn.classList.add('disabled');
 							flagBtn.disabled = true;
-							/* Brief toast-like feedback */
-							var toast = document.createElement('div');
-							toast.className = 'forums-report-toast';
-							toast.textContent = messageDetail.dataset.labelReportSubmitted || 'Thank you! Your report has been submitted.';
-							messageDetail.prepend(toast);
-							setTimeout(function() { toast.classList.add('forums-report-toast--visible'); }, 10);
-							setTimeout(function() {
-								toast.classList.remove('forums-report-toast--visible');
-								setTimeout(function() { toast.remove(); }, 300);
-							}, 3000);
+							/* Standard Liferay toast feedback */
+							if (Liferay.Util && Liferay.Util.openToast) {
+								Liferay.Util.openToast({
+									message: messageDetail.dataset.labelReportSubmitted || 'Thank you! Your report has been submitted.',
+									type: 'success'
+								});
+							}
 						});
 					} else {
 						onError();
@@ -1451,7 +1472,7 @@ if (messageDetail) {
 			if (erc === 'Mappable Message ERC') erc = null;
 
 			if (!erc) {
-				if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty">' + (messageDetail.dataset.labelErcNotMapped || 'Message ERC is not mapped.') + '</div>';
+				if (loadingEl) loadingEl.innerHTML = '<div class="forums-message-list__empty text-secondary text-center py-5">' + (messageDetail.dataset.labelErcNotMapped || 'Message ERC is not mapped.') + '</div>';
 			} else {
 				Liferay.Util.fetch(portalURL + '/o/c/forummessages/scopes/' + scopeGroupId + '/by-external-reference-code/' + encodeURIComponent(erc), {
 					headers: headers,

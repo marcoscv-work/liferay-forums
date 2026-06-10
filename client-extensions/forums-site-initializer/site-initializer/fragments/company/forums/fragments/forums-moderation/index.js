@@ -55,8 +55,11 @@ if (forumsMod) {
 	}
 
 	function getReasonBadgeClass(reason) {
-		var safe = (reason || 'other').replace(/[^a-z0-9-]/gi, '-').toLowerCase();
-		return 'forums-moderation__reason-badge forums-moderation__reason-badge--' + safe;
+		if (reason === 'spam') return 'label label-warning';
+		if (reason === 'harmful-dangerous-acts' || reason === 'harassment-bullying' || reason === 'nudity-sexual-content') {
+			return 'label label-danger';
+		}
+		return 'label label-secondary';
 	}
 
 	function showConfirmModal(message, confirmLabel, onConfirm) {
@@ -75,15 +78,28 @@ if (forumsMod) {
 		modal.setAttribute('aria-labelledby', 'forumsModConfirmHeading');
 
 		modal.innerHTML = `
-			<div class="modal-dialog modal-dialog-sm modal-dialog-centered">
+			<div class="modal-dialog modal-dialog-sm modal-dialog-centered modal-danger">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h1 class="modal-title" id="forumsModConfirmHeading" tabindex="-1">${Liferay.Util.escapeHTML(message)}</h1>
+						<h1 class="modal-title" tabindex="-1">
+							<div class="modal-title-indicator">
+								<svg class="lexicon-icon lexicon-icon-exclamation-full" role="presentation"><use href="${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg#exclamation-full"></use></svg>
+							</div>
+							<span id="forumsModConfirmHeading">${Liferay.Util.escapeHTML(confirmLabel)}</span>
+						</h1>
+						<button class="close btn btn-unstyled" type="button" id="forumsModConfirmClose" aria-label="${Liferay.Util.escapeHTML(forumsMod.dataset.labelCancel || 'Cancel')}">
+							<svg class="lexicon-icon lexicon-icon-times" focusable="false" role="presentation"><use href="${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg#times"></use></svg>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="liferay-modal-body">${Liferay.Util.escapeHTML(message)}</div>
 					</div>
 					<div class="modal-footer">
-						<div class="btn-group-spaced" role="group">
-							<button class="btn btn-secondary" type="button" id="forumsModConfirmCancel">${Liferay.Util.escapeHTML(forumsMod.dataset.labelCancel || 'Cancel')}</button>
-							<button class="btn btn-danger" type="button" id="forumsModConfirmOk">${Liferay.Util.escapeHTML(confirmLabel)}</button>
+						<div class="modal-item-last">
+							<div class="btn-group-spaced" role="group">
+								<button class="btn btn-secondary" type="button" id="forumsModConfirmCancel">${Liferay.Util.escapeHTML(forumsMod.dataset.labelCancel || 'Cancel')}</button>
+								<button class="btn btn-danger" type="button" id="forumsModConfirmOk">${Liferay.Util.escapeHTML(confirmLabel)}</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -92,33 +108,34 @@ if (forumsMod) {
 		document.body.appendChild(modal);
 		var previousFocus = document.activeElement;
 
+		function onKeydown(e) {
+			if (e.key === 'Escape') closeModal();
+		}
+
 		function closeModal() {
+			document.removeEventListener('keydown', onKeydown);
 			modal.remove();
 			if (previousFocus) previousFocus.focus();
 		}
 
 		modal.querySelector('#forumsModConfirmCancel').addEventListener('click', closeModal);
+		modal.querySelector('#forumsModConfirmClose').addEventListener('click', closeModal);
 		modal.querySelector('#forumsModConfirmOk').addEventListener('click', function() {
 			closeModal();
 			onConfirm();
 		});
-		modal.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape') closeModal();
+		modal.addEventListener('click', function(e) {
+			if (e.target === modal) closeModal();
 		});
+		document.addEventListener('keydown', onKeydown);
 
-		modal.querySelector('#forumsModConfirmHeading').focus();
+		modal.querySelector('.modal-title').focus();
 	}
 
 	function showToast(message) {
-		var toast = document.createElement('div');
-		toast.className = 'forums-moderation-toast';
-		toast.textContent = message;
-		flagList.parentNode.insertBefore(toast, flagList);
-		setTimeout(function() { toast.classList.add('forums-moderation-toast--visible'); }, 10);
-		setTimeout(function() {
-			toast.classList.remove('forums-moderation-toast--visible');
-			setTimeout(function() { toast.remove(); }, 300);
-		}, 3000);
+		if (Liferay.Util && Liferay.Util.openToast) {
+			Liferay.Util.openToast({ message: message, type: 'success' });
+		}
 	}
 
 	/* Tab click handlers */
@@ -193,7 +210,7 @@ if (forumsMod) {
 			var lastPage = data.lastPage || 1;
 
 			if (items.length === 0) {
-				flagList.innerHTML = '<div class="list-group-item text-muted">' + (forumsMod.dataset.labelNoBans || 'No bans found.') + '</div>';
+				flagList.innerHTML = '<div class="list-group-item text-secondary">' + (forumsMod.dataset.labelNoBans || 'No bans found.') + '</div>';
 				return;
 			}
 
@@ -206,7 +223,7 @@ if (forumsMod) {
 				titleLink.className = 'forums-moderation__message-title font-weight-bold';
 				titleLink.textContent = (forumsMod.dataset.labelUserId || 'User ID: {0}').replace('{0}', ban.banUserId);
 				var metaDiv = document.createElement('div');
-				metaDiv.className = 'forums-moderation__flag-meta mt-1';
+				metaDiv.className = 'forums-moderation__flag-meta text-secondary small mt-1';
 				var dateSpan = document.createElement('span');
 				dateSpan.textContent = (forumsMod.dataset.labelBannedOn || 'Banned on: {0}').replace('{0}', formatDate(ban.dateCreated));
 				metaDiv.appendChild(dateSpan);
@@ -288,7 +305,7 @@ if (forumsMod) {
 			var lastPage = data.lastPage || 1;
 
 			if (items.length === 0) {
-				flagList.innerHTML = '<div class="list-group-item text-muted">' + (forumsMod.dataset.labelNoFlags || 'No flagged messages found.') + '</div>';
+				flagList.innerHTML = '<div class="list-group-item text-secondary">' + (forumsMod.dataset.labelNoFlags || 'No flagged messages found.') + '</div>';
 				return;
 			}
 
@@ -322,7 +339,7 @@ if (forumsMod) {
 				titleLink.title = forumsMod.dataset.labelViewMessage || 'View Message';
 
 				var metaDiv = document.createElement('div');
-				metaDiv.className = 'forums-moderation__flag-meta';
+				metaDiv.className = 'forums-moderation__flag-meta text-secondary small';
 
 				/* Reporter */
 				var reportedByTmpl = forumsMod.dataset.labelReportedBy || 'Reported by {0}';
@@ -340,7 +357,7 @@ if (forumsMod) {
 
 				/* Status badge */
 				var statusBadge = document.createElement('span');
-				statusBadge.className = 'forums-moderation__status-badge forums-moderation__status-badge--' + (isValidated ? 'validated' : 'pending');
+				statusBadge.className = 'label ' + (isValidated ? 'label-success' : 'label-warning');
 				statusBadge.textContent = isValidated
 					? (forumsMod.dataset.labelValidated || 'Validated')
 					: (forumsMod.dataset.labelPending || 'Pending');
