@@ -30,7 +30,6 @@ if (messageDetail) {
 	var opAvatar = messageDetail.querySelector('#forumsDetailOPAvatar');
 	var opAuthor = messageDetail.querySelector('#forumsDetailOPAuthor');
 	var opDate = messageDetail.querySelector('#forumsDetailOPDate');
-	var opViews = messageDetail.querySelector('#forumsDetailOPViews');
 	var opTags = messageDetail.querySelector('#forumsDetailOPTags');
 	var solvedBanner = messageDetail.querySelector('#forumsDetailSolvedBanner');
 	var solutionSection = messageDetail.querySelector('#forumsDetailSolutionSection');
@@ -990,11 +989,6 @@ if (messageDetail) {
 					var dateTmpl = messageDetail.dataset.labelPostedOn || 'Posted on: {0}';
 					opDate.textContent = dateTmpl.replace('{0}', formatDate(opMsg.dateCreated));
 				}
-				if (opViews) {
-					var viewLabel = messageDetail.dataset.labelViews || 'Views';
-					opViews.textContent = newViewCount + ' ' + viewLabel;
-				}
-
 				/* Render OP Tags */
 				if (opTags && messageTagsArray.length > 0) {
 					var tagsHtml = messageTagsArray.map(function(tag) {
