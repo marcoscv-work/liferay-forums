@@ -12,6 +12,16 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 	display: block !important;
 }
 
+/* Options dropdown button on the OP: classic theme's `.btn-secondary`
+   resolves --btn-secondary-border-color to #cdced9 (a visible gray), so
+   even the non-outline variant ships a 1px gray border. Override it to
+   transparent here to get a truly borderless icon button while keeping
+   the btn-secondary hover background. */
+
+.forums-message-detail #forumsDetailOptions {
+	border-color: transparent;
+}
+
 /* Title row */
 
 .forums-message-detail__title-row {
