@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: LGPL-2.1-or-later -->
 [#assign scopeGroup = themeDisplay.getScopeGroup() /]
 [#assign forumsHome = (themeDisplay.getPathFriendlyURLPublic()!"") + (scopeGroup.getFriendlyURL()!"") /]
-<div class="forums-message-detail panel panel-secondary" id="forumsMessageDetail"
+<div class="forums-message-detail" id="forumsMessageDetail"
 	data-label-unknown="${languageUtil.get(locale, "unknown")}"
 	data-label-no-message="${languageUtil.get(locale, "no-message-selected")}"
 	data-label-untitled-message="${languageUtil.get(locale, "untitled-message")}"
