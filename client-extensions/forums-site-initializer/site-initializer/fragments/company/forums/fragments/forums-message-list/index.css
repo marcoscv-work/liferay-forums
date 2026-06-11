@@ -42,12 +42,6 @@
 	width: 64px;
 }
 
-.forums-message-card__username {
-	display: block;
-	font-size: 0.75rem;
-	margin-top: 0.5rem;
-}
-
 .forums-message-card__title {
 	font-size: 1.0625rem;
 }
@@ -128,10 +122,6 @@
 		align-items: center;
 		gap: 0.5rem;
 		width: auto;
-	}
-
-	.forums-message-card__username {
-		margin-top: 0;
 	}
 }
 
