@@ -1,8 +1,12 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-/* The list, links and empty state are rendered with Clay's `list-group` and
-   utility classes, so no custom styling is needed. The only rules here reveal
-   the hidden ERC mapping fields while editing the page. */
+/* The previous Clay `panel-title` class on the heading enforced an UPPERCASE
+   text-transform and a 0.875rem font-size; this rule replaces it with a
+   plain title-case heading at 1.25rem (20px). */
+
+.forums-related-topics__heading {
+	font-size: 1.25rem;
+}
 
 body.has-edit-mode-menu #forumsRelatedTopicsERC,
 body.has-edit-mode-menu #forumsRelatedTopicsReplyERC {
