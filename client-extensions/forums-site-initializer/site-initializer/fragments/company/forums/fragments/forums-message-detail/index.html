@@ -78,6 +78,16 @@
 			</div>
 		</div>
 
+		<!-- Author info (moved above the post body) -->
+		<div class="forums-message-detail__author-info" id="forumsDetailAuthorInfo" style="display:none;">
+			<span class="sticker sticker-circle sticker-lg sticker-outline-0" id="forumsDetailOPAvatar"></span>
+			<div>
+				<span class="d-block text-dark font-weight-bold" id="forumsDetailOPAuthor"></span>
+				<span class="d-block text-secondary small" id="forumsDetailOPDate"></span>
+				<span class="d-block text-secondary small" id="forumsDetailOPViews" style="margin-left: 1rem;"></span>
+			</div>
+		</div>
+
 		<!-- Solved indicator -->
 		<div class="alert alert-success d-flex align-items-center forums-message-detail__solved-banner" id="forumsDetailSolvedBanner" style="display:none;" role="alert">
 			<span class="alert-indicator mr-2">
@@ -153,19 +163,9 @@
 		<div class="forums-message-detail__op" id="forumsDetailOP" style="display:none;">
 			<div class="forums-message-detail__post-body" id="forumsDetailOPBody"></div>
 			<div class="forums-message-detail__tags" id="forumsDetailOPTags" style="display:none;"></div>
-			<div class="forums-message-detail__author-bar">
-				<div class="forums-message-detail__author-info">
-					<span class="sticker sticker-circle sticker-lg sticker-outline-0" id="forumsDetailOPAvatar"></span>
-					<div>
-						<span class="d-block text-dark font-weight-bold" id="forumsDetailOPAuthor"></span>
-						<span class="d-block text-secondary small" id="forumsDetailOPDate"></span>
-						<span class="d-block text-secondary small" id="forumsDetailOPViews" style="margin-left: 1rem;"></span>
-					</div>
-				</div>
-				<div class="forums-message-detail__post-actions" id="forumsDetailOPActions">
-					<div class="forums-vote" id="forumsDetailOPVote"></div>
-					<button class="btn btn-secondary btn-sm" id="forumsDetailReplyBtn" aria-label="${languageUtil.get(locale, "reply")}"></button>
-				</div>
+			<div class="forums-message-detail__post-actions" id="forumsDetailOPActions">
+				<div class="forums-vote" id="forumsDetailOPVote"></div>
+				<button class="btn btn-secondary btn-sm" id="forumsDetailReplyBtn" aria-label="${languageUtil.get(locale, "reply")}"></button>
 			</div>
 		</div>
 

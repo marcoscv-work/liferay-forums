@@ -1006,6 +1006,9 @@ if (messageDetail) {
 
 				if (opSection) opSection.style.display = '';
 
+				var authorInfoEl = messageDetail.querySelector('#forumsDetailAuthorInfo');
+				if (authorInfoEl) authorInfoEl.style.display = '';
+
 				/* Render OP vote buttons */
 				var opVoteEl = messageDetail.querySelector('#forumsDetailOPVote');
 				if (opVoteEl) {

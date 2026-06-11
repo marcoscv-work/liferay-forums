@@ -78,22 +78,17 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 	margin-bottom: 1.25rem;
 }
 
-/* Author / byline bars */
-
-.forums-message-detail__author-bar {
-	align-items: center;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-	justify-content: space-between;
-	margin-top: 1.5rem;
-}
+/* Author info — sits between the title and the post body */
 
 .forums-message-detail__author-info,
 .forums-message-detail__reply-author-info {
 	align-items: center;
 	display: flex;
 	gap: 0.75rem;
+}
+
+.forums-message-detail__author-info {
+	margin-bottom: 1.5rem;
 }
 
 .forums-message-detail__post-actions,
@@ -171,15 +166,6 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 	gap: 1.5rem;
 	justify-content: center;
 	margin-top: 1.5rem;
-}
-
-/* Responsive */
-
-@media (max-width: 767.98px) {
-	.forums-message-detail__author-bar {
-		align-items: flex-start;
-		flex-direction: column;
-	}
 }
 
 /* Loading skeleton: self-contained SVG content-loaders (the shimmer animation
