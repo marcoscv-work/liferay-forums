@@ -78,6 +78,17 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 	margin-bottom: 1.25rem;
 }
 
+/* OP-author badge: a pastel-blue chip using the theme's `--blue-l5`
+   light token. Falls back to the equivalent Classic theme value so
+   third-party Style Books that redefine `--blue-l5` automatically
+   propagate. */
+
+.forums-message-detail__author-badge {
+	background-color: var(--blue-l5, #e5f1ff);
+	border-color: var(--blue-l5, #e5f1ff);
+	color: var(--primary-d2, #004ad7);
+}
+
 /* Author info — sits between the title and the post body */
 
 .forums-message-detail__author-info,

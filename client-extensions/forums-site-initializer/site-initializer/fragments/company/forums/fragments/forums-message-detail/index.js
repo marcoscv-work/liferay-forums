@@ -224,7 +224,7 @@ if (messageDetail) {
 				<div class="autofit-col autofit-col-expand forums-message-detail__reply-content">
 					<div class="forums-message-detail__reply-header">
 						<span class="text-dark font-weight-bold">${Liferay.Util.escapeHTML(name)}</span>
-						${isAuthor ? `<span class="label label-lg label-inverse-info">${messageDetail.dataset.labelAuthor || 'Author'}</span>` : ''}
+						${isAuthor ? `<span class="label label-lg forums-message-detail__author-badge">${messageDetail.dataset.labelAuthor || 'Author'}</span>` : ''}
 						<span class="text-secondary small">${date}</span>
 					</div>
 					${isSolution ? `<span class="label label-lg label-inverse-success forums-vote__accepted-badge mb-2">&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}</span>` : ''}
