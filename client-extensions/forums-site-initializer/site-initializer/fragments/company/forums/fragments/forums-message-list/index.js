@@ -337,7 +337,7 @@ if (messageList) {
 					+ '<span class="forums-message-card__meta-item">' + replyIcon + ' ' + (replyCount === 1 ? (messageList.dataset.labelXReply || '{0} reply').replace('{0}', replyCount) : (messageList.dataset.labelXReplies || '{0} replies').replace('{0}', replyCount)) + '</span>'
 					+ '<span class="forums-message-card__meta-item">' + eyeIcon + ' ' + (msg.viewCount || 0) + '</span>'
 					+ (msg.actions && msg.actions['delete']
-						? '<span class="forums-message-card__meta-item ml-auto"><button class="btn btn-danger btn-sm forums-list-delete-btn" data-delete-url="' + msg.actions['delete'].href + '" title="' + (messageList.dataset.labelDelete || 'Delete') + '" aria-label="' + (messageList.dataset.labelDelete || 'Delete') + '"><svg class="lexicon-icon lexicon-icon-trash" role="presentation"><use href="' + clayIconsUrl + '#trash"></use></svg></button></span>'
+						? '<span class="forums-message-card__meta-item ml-auto"><button class="btn btn-monospaced btn-sm btn-outline-warning forums-list-delete-btn" data-delete-url="' + msg.actions['delete'].href + '" title="' + (messageList.dataset.labelDelete || 'Delete') + '" aria-label="' + (messageList.dataset.labelDelete || 'Delete') + '"><svg class="lexicon-icon lexicon-icon-trash" role="presentation"><use href="' + clayIconsUrl + '#trash"></use></svg></button></span>'
 						: '')
 					+ '</div>'
 					+ '</div>'
