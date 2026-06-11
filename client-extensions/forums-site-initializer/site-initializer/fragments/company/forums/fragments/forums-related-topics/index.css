@@ -9,17 +9,25 @@
 }
 
 /* List items: drop the dividers and the hover background so each row reads
-   as a plain anchor link. The list-group padding still drives the spacing
-   between rows. */
+   as a plain anchor link. Also align rows to the fragment edge (no extra
+   horizontal padding from list-group) so they line up with the heading. */
 
 .forums-related-topics .list-group-item {
 	border: 0;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.forums-related-topics .list-group-item-action {
+	color: var(--primary, #0b5fff);
 }
 
 .forums-related-topics .list-group-item-action:hover,
 .forums-related-topics .list-group-item-action:focus,
 .forums-related-topics .list-group-item-action.hover {
 	background-color: transparent;
+	color: var(--primary-d2, #004ad7);
+	text-decoration: underline;
 }
 
 body.has-edit-mode-menu #forumsRelatedTopicsERC,
