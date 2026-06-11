@@ -40,6 +40,7 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 }
 
 .forums-message-detail__post-body {
+	font-size: 1rem;
 	margin-bottom: 1.5rem;
 }
 
