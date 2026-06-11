@@ -168,12 +168,10 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 /* Topic navigation */
 
 .forums-message-detail__topic-nav {
-	border-top: 1px solid var(--gray-200, #e7e7ed);
 	display: flex;
 	gap: 1.5rem;
 	justify-content: center;
 	margin-top: 1.5rem;
-	padding-top: 1.5rem;
 }
 
 /* Responsive */
