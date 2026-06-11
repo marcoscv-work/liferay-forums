@@ -50,7 +50,6 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 .forums-message-detail__post-body pre,
 .forums-message-detail__reply-body pre {
 	background-color: var(--gray-100, #f1f2f5);
-	border: 1px solid var(--gray-200, #e7e7ed);
 	border-radius: var(--border-radius, 0.25rem);
 	overflow-x: auto;
 	padding: 1rem;
