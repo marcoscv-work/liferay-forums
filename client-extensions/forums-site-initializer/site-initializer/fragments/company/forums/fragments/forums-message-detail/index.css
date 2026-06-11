@@ -199,19 +199,15 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 }
 
 .forums-skeleton-card {
-	border: 1px solid var(--gray-200, #e7e7ed);
-	border-radius: var(--border-radius, 0.25rem);
 	margin-bottom: 1rem;
-	padding: 1.5rem;
+	padding: 1.5rem 0;
 }
 
 .forums-skeleton-author {
 	align-items: center;
-	border-top: 1px solid var(--gray-200, #e7e7ed);
 	display: flex;
 	gap: 0.75rem;
 	margin-top: 1.25rem;
-	padding-top: 1rem;
 }
 
 .forums-skeleton-avatar {
