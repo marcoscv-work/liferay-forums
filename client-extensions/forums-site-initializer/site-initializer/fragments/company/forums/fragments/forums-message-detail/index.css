@@ -83,13 +83,11 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 
 .forums-message-detail__author-bar {
 	align-items: center;
-	border-top: 1px solid var(--gray-200, #e7e7ed);
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
 	justify-content: space-between;
 	margin-top: 1.5rem;
-	padding-top: 1rem;
 }
 
 .forums-message-detail__author-info,
