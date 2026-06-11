@@ -224,10 +224,10 @@ if (messageDetail) {
 				<div class="autofit-col autofit-col-expand forums-message-detail__reply-content">
 					<div class="forums-message-detail__reply-header">
 						<span class="text-dark font-weight-bold">${Liferay.Util.escapeHTML(name)}</span>
-						${isAuthor ? `<span class="label label-info">${messageDetail.dataset.labelAuthor || 'Author'}</span>` : ''}
+						${isAuthor ? `<span class="label label-lg label-info">${messageDetail.dataset.labelAuthor || 'Author'}</span>` : ''}
 						<span class="text-secondary small">${date}</span>
 					</div>
-					${isSolution ? `<span class="label label-success forums-vote__accepted-badge mb-2">&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}</span>` : ''}
+					${isSolution ? `<span class="label label-lg label-success forums-vote__accepted-badge mb-2">&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}</span>` : ''}
 					<div class="forums-message-detail__reply-body">${body}</div>
 					<div class="forums-message-detail__reply-actions">
 						${canReply ? `<button class="btn btn-outline-secondary btn-sm" type="button" data-forums-compose data-forums-reply data-forums-message-id="${msg.r_messageReplies_c_forumMessageId}" data-forums-parent-id="${msg.id}"><span class="inline-item inline-item-before"><svg class="lexicon-icon lexicon-icon-reply" role="presentation"><use href="${clayIconsUrl}#reply"></use></svg></span>${messageDetail.dataset.labelReply || 'Reply'}</button>` : ''}
@@ -992,7 +992,7 @@ if (messageDetail) {
 				/* Render OP Tags */
 				if (opTags && messageTagsArray.length > 0) {
 					var tagsHtml = messageTagsArray.map(function(tag) {
-						return `<span class="label label-secondary"><span class="label-item label-item-expand">${Liferay.Util.escapeHTML(tag)}</span></span>`;
+						return `<span class="label label-lg label-secondary"><span class="label-item label-item-expand">${Liferay.Util.escapeHTML(tag)}</span></span>`;
 					}).join('');
 					opTags.innerHTML = tagsHtml;
 					opTags.style.display = '';
