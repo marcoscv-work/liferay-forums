@@ -1,5 +1,15 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
+/* Nudge the whole fragment 5px down so the heading isn't quite flush with
+   the top of the section. This is a soft visual alignment toward the
+   message-detail title baseline on the left column — not a precise
+   baseline match, just less jarring than the heading sitting at the very
+   top edge. */
+
+.forums-related-topics {
+	margin-top: 5px;
+}
+
 /* The previous Clay `panel-title` class on the heading enforced an UPPERCASE
    text-transform and a 0.875rem font-size; this rule replaces it with a
    plain title-case heading at 1.25rem (20px). */
