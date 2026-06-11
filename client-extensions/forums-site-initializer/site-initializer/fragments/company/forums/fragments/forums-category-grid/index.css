@@ -1,8 +1,10 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-/* Category cards use Clay's `panel panel-secondary` component, which is fully
-   token-driven. The only custom rule is clamping the description to two lines,
-   which Clay has no utility for. */
+.forums-category-grid__card-icon {
+	background-color: var(--primary-l4, #c5dbff);
+	border-radius: var(--border-radius-sm, 4px);
+	color: var(--primary, #0063ce);
+}
 
 .forums-category-grid__card-desc {
 	-webkit-box-orient: vertical;
