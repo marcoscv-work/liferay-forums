@@ -86,7 +86,7 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 .forums-message-detail__author-badge {
 	background-color: var(--blue-l5, #e5f1ff);
 	border-color: var(--blue-l5, #e5f1ff);
-	color: var(--primary-d2, #004ad7);
+	color: var(--blue-d2, #005fcc);
 }
 
 /* Author info — sits between the title and the post body */
