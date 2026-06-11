@@ -125,12 +125,7 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 }
 
 .forums-message-detail__reply-card {
-	border-bottom: 1px solid var(--gray-200, #e7e7ed);
 	padding: 1.25rem 0;
-}
-
-.forums-message-detail__reply-card:last-child {
-	border-bottom: 0;
 }
 
 .forums-message-detail__reply-card--solution {
