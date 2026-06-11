@@ -992,7 +992,7 @@ if (messageDetail) {
 				/* Render OP Tags */
 				if (opTags && messageTagsArray.length > 0) {
 					var tagsHtml = messageTagsArray.map(function(tag) {
-						return `<span class="label label-lg label-inverse-light"><span class="label-item label-item-expand">${Liferay.Util.escapeHTML(tag)}</span></span>`;
+						return `<span class="label label-lg forums-message-detail__tag"><span class="label-item label-item-expand">${Liferay.Util.escapeHTML(tag)}</span></span>`;
 					}).join('');
 					opTags.innerHTML = tagsHtml;
 					opTags.style.display = '';

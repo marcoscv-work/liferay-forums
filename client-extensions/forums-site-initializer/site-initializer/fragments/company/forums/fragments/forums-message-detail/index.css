@@ -89,6 +89,16 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 	color: var(--blue-d2, #005fcc);
 }
 
+/* OP tag chips: a neutral light-gray fill with near-black text, pairing
+   `--secondary-l3` and `--dark-d2` from the Classic theme so the chip
+   reads as a quiet categorical marker (not a CTA). */
+
+.forums-message-detail__tag {
+	background-color: var(--secondary-l3, #e7e7ed);
+	border-color: var(--secondary-l3, #e7e7ed);
+	color: var(--dark-d2, #111116);
+}
+
 /* Author info — sits between the title and the post body */
 
 .forums-message-detail__author-info,
