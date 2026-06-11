@@ -1033,62 +1033,42 @@ if (messageDetail) {
 						</button>`;
 				}
 
-				/* Render OP Delete/Edit buttons if permitted (HATEOAS) */
-				var opActionsEl = messageDetail.querySelector('#forumsDetailOPActions');
-				if (opActionsEl) {
-					var oldDel = opActionsEl.querySelector('.forums-delete-btn');
-					if (oldDel) oldDel.remove();
-					var oldEdit = opActionsEl.querySelector('.forums-edit-btn');
-					if (oldEdit) oldEdit.remove();
-					
-					var rBtn = opActionsEl.querySelector('#forumsDetailReplyBtn');
-					
-					if (rBtn && (canUpdateMessage || messageDeleteUrl)) {
-						rBtn.style.marginRight = '0.5rem';
-					}
-					
-					/* Use the message's update permissions */
-					if (canUpdateMessage) {
-						var editBtn = document.createElement('button');
-						editBtn.className = 'btn btn-secondary btn-sm forums-edit-btn';
-						if (messageDeleteUrl) {
-							editBtn.style.marginRight = '0.5rem';
+				/* Wire up OP Edit / Delete dropdown items if permitted (HATEOAS).
+				   The buttons live in the options dropdown next to the title;
+				   here we just toggle their visibility and (re)attach handlers. */
+				var dropdownEditBtn = messageDetail.querySelector('#forumsDetailEditBtn');
+				if (dropdownEditBtn && canUpdateMessage) {
+					dropdownEditBtn.style.display = '';
+					/* Clone to clear any prior click handler from previous loadMessages. */
+					var newDropdownEditBtn = dropdownEditBtn.cloneNode(true);
+					dropdownEditBtn.parentNode.replaceChild(newDropdownEditBtn, dropdownEditBtn);
+					newDropdownEditBtn.addEventListener('click', function(e) {
+						e.preventDefault();
+						if (window.forumsOpenComposeModal) {
+							window.forumsOpenComposeModal({
+								editMode: true,
+								isOp: true,
+								messageId: opMsg.id,
+								categoryId: messageCategoryFK,
+								subject: messageTitleText,
+								body: opMsg.body,
+								isQuestion: isMessageQuestion,
+								tags: messageTagsArray
+							});
 						}
-						editBtn.setAttribute('title', messageDetail.dataset.labelEditTopic || 'Edit Topic');
-						editBtn.setAttribute('aria-label', messageDetail.dataset.labelEditTopic || 'Edit Topic');
-						editBtn.innerHTML = `<svg class="lexicon-icon lexicon-icon-pencil" role="presentation"><use href="${clayIconsUrl}#pencil"></use></svg>`;
-						
-						editBtn.addEventListener('click', function(e) {
-							e.preventDefault();
-							if (window.forumsOpenComposeModal) {
-								window.forumsOpenComposeModal({
-									editMode: true,
-									isOp: true,
-									messageId: messageId,
-									messageId: opMsg.id,
-									categoryId: messageCategoryFK,
-									subject: messageTitleText,
-									body: opMsg.body,
-									isQuestion: isMessageQuestion,
-									tags: messageTagsArray
-								});
-							}
-						});
-						
-						opActionsEl.appendChild(editBtn);
-					}
-					
-					/* Use the message's delete URL for the OP so the whole topic is removed */
-					if (messageDeleteUrl) {
-						var delBtn = document.createElement('button');
-						delBtn.className = 'btn btn-danger btn-sm forums-delete-btn';
-						delBtn.setAttribute('data-delete-url', messageDeleteUrl);
-						delBtn.setAttribute('title', messageDetail.dataset.labelDeleteTopic || 'Delete Topic');
-						delBtn.setAttribute('aria-label', messageDetail.dataset.labelDeleteTopic || 'Delete Topic');
-						delBtn.innerHTML = `<svg class="lexicon-icon lexicon-icon-trash" role="presentation"><use href="${clayIconsUrl}#trash"></use></svg>`;
-						
-						opActionsEl.appendChild(delBtn);
-					}
+					});
+				}
+
+				var dropdownDeleteBtn = messageDetail.querySelector('#forumsDetailDeleteBtn');
+				if (dropdownDeleteBtn && messageDeleteUrl) {
+					/* Clone to clear any prior click handler from previous loadMessages
+					   (attachDeleteHandlers() re-binds on the new node below). */
+					var newDropdownDeleteBtn = dropdownDeleteBtn.cloneNode(true);
+					newDropdownDeleteBtn.setAttribute('data-delete-url', messageDeleteUrl);
+					newDropdownDeleteBtn.style.display = '';
+					dropdownDeleteBtn.parentNode.replaceChild(newDropdownDeleteBtn, dropdownDeleteBtn);
+					/* The click handler is attached by the shared attachDeleteHandlers()
+					   call below because the element carries .forums-delete-btn. */
 				}
 
 				/* Render OP Toggle Question button if permitted (HATEOAS) */

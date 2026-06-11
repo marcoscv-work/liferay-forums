@@ -71,9 +71,11 @@
 					</svg>
 				</button>
 				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="forumsDetailOptions">
+					<a class="dropdown-item" href="#" id="forumsDetailEditBtn" style="display:none;">${languageUtil.get(locale, "edit-topic")}</a>
 					<a class="dropdown-item" href="#" id="forumsDetailToggleQuestionBtn" style="display:none;"></a>
 					<a class="dropdown-item" href="#" id="forumsDetailFlagBtn">${languageUtil.get(locale, "flag-message")}</a>
 					<a class="dropdown-item" href="#" id="forumsDetailSubscribeBtn" style="display:none;"></a>
+					<a class="dropdown-item text-danger forums-delete-btn" href="#" id="forumsDetailDeleteBtn" style="display:none;">${languageUtil.get(locale, "delete-topic")}</a>
 				</div>
 			</div>
 		</div>
