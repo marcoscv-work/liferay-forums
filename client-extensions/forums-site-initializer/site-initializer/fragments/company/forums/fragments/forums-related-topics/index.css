@@ -19,13 +19,18 @@
 }
 
 /* List items: drop the dividers and the hover background so each row reads
-   as a plain anchor link. Also align rows to the fragment edge (no extra
-   horizontal padding from list-group) so they line up with the heading. */
+   as a plain anchor link. Also align rows to the fragment edge (no
+   list-group padding) so they line up with the heading, and use a 1rem
+   gap on the flex list-group container for an even 16px space between
+   each link. */
+
+.forums-related-topics .list-group {
+	gap: 1rem;
+}
 
 .forums-related-topics .list-group-item {
 	border: 0;
-	padding-left: 0;
-	padding-right: 0;
+	padding: 0;
 }
 
 .forums-related-topics .list-group-item-action {
