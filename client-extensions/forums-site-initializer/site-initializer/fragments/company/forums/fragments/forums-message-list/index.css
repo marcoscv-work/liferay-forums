@@ -80,6 +80,12 @@
 	margin-bottom: 0.5rem;
 }
 
+.forums-message-card__tag {
+	background-color: var(--secondary-l3, #e7e7ed);
+	border-color: var(--secondary-l3, #e7e7ed);
+	color: var(--dark-d2, #111116);
+}
+
 .forums-message-card__meta {
 	align-items: center;
 	display: flex;

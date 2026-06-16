@@ -344,7 +344,7 @@ if (messageList) {
 						if (messageTags.length === 0) return '';
 						var tHtml = '<div class="forums-message-card__tags">';
 						messageTags.forEach(function(tag) {
-							tHtml += '<span class="label label-secondary forums-message-card__tag"><span class="label-item label-item-expand">' + Liferay.Util.escapeHTML(tag) + '</span></span>';
+							tHtml += '<span class="label label-lg forums-message-card__tag"><span class="label-item label-item-expand">' + Liferay.Util.escapeHTML(tag) + '</span></span>';
 						});
 						tHtml += '</div>';
 						return tHtml;
