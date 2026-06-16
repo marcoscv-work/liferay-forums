@@ -56,8 +56,8 @@ if (messageDetail) {
 		allTopicsLink.href = sitePrefix + ((typeof configuration !== 'undefined' && configuration.communityURL) ? configuration.communityURL : '/forums');
 	}
 
-	// Also fix the hidden community breadcrumb link, which could be the 1st one
-	var communityBreadcrumb = messageDetail.querySelector('.forums-message-detail__breadcrumb li:first-child a');
+	// Point the first breadcrumb crumb ("Forums") at the configured community home
+	var communityBreadcrumb = messageDetail.querySelector('#forumsDetailBreadcrumb li:first-child a');
 	if (communityBreadcrumb) {
 		communityBreadcrumb.href = sitePrefix + ((typeof configuration !== 'undefined' && configuration.communityURL) ? configuration.communityURL : '/forums');
 	}

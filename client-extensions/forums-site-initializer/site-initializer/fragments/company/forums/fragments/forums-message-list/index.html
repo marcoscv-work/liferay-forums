@@ -26,7 +26,7 @@
 		<!-- Breadcrumb -->
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb" id="forumsMessageListBreadcrumb">
-				<li class="breadcrumb-item"><a class="breadcrumb-link" href="?">${languageUtil.get(locale, "forums")}</a></li>
+				<li class="breadcrumb-item"><a class="breadcrumb-link" id="forumsMessageListBreadcrumbHome" href="#">${languageUtil.get(locale, "forums")}</a></li>
 				<li class="breadcrumb-item active"><a class="breadcrumb-link" aria-current="page" href="#" id="forumsMessageListCategoryName">${languageUtil.get(locale, "all-discussions")}</a></li>
 			</ol>
 		</nav>
@@ -40,7 +40,7 @@
 				</select>
 				<div class="forums-message-list__search input-group" id="forumsMessageListSearch">
 					<div class="input-group-item">
-						<input type="text" class="form-control input-group-inset input-group-inset-after" id="forumsMessageListSearchInput" placeholder="${languageUtil.get(locale, "search-messages")}" aria-label="${languageUtil.get(locale, "search-messages")}">
+						<input type="text" class="form-control input-group-inset input-group-inset-after" id="forumsMessageListSearchInput" aria-label="${languageUtil.get(locale, "search-messages")}">
 						<div class="input-group-inset-item input-group-inset-item-after">
 							<button class="btn btn-unstyled" type="button" id="forumsMessageListSearchBtn" aria-label="${languageUtil.get(locale, "search-messages")}">
 								<svg class="lexicon-icon lexicon-icon-search" focusable="false" role="presentation">

@@ -4,11 +4,28 @@ var messageList = fragmentElement.querySelector('#forumsMessageList');
 if (messageList) {
 	var portalURL = Liferay.ThemeDisplay.getPortalURL();
 	var scopeGroupId = Liferay.ThemeDisplay.getScopeGroupId();
+	var pathFriendlyURLPublic = Liferay.ThemeDisplay.getPathFriendlyURLPublic();
+	var sitePrefix = '';
+	if (pathFriendlyURLPublic) {
+		var pubPath = pathFriendlyURLPublic + '/';
+		if (window.location.pathname.indexOf(pubPath) === 0) {
+			var rest = window.location.pathname.substring(pubPath.length);
+			var slugEnd = rest.indexOf('/');
+			var siteSlug = slugEnd === -1 ? rest : rest.substring(0, slugEnd);
+			sitePrefix = pathFriendlyURLPublic + '/' + siteSlug;
+		}
+	}
 	var headers = {
 		'Accept': 'application/json',
 		'Content-Type': 'application/json'
 	};
 	var clayIconsUrl = Liferay.ThemeDisplay.getPathThemeImages() + '/clay/icons.svg';
+
+	/* Point first breadcrumb crumb ("Forums") at the configured community home */
+	var homeCrumb = messageList.querySelector('#forumsMessageListBreadcrumbHome');
+	if (homeCrumb) {
+		homeCrumb.href = sitePrefix + ((typeof configuration !== 'undefined' && configuration.communityURL) ? configuration.communityURL : '/forums');
+	}
 
 	/* State */
 	var currentSort = 'dateCreated:desc';
@@ -297,10 +314,9 @@ if (messageList) {
 					solvedBadge = '<span class="forums-message-card__solved text-success font-weight-semi-bold ml-2">' + checkIcon + ' ' + solvedText + '</span>';
 				}
 
-				var siteSlug = (msg.scopeKey || '').toLowerCase().replace(/ /g, '-');
 				var messageObjectRoute = configuration.messageObjectRoute || 'c_forummessage';
 				var topicHref = msg.friendlyUrlPath
-					? Liferay.ThemeDisplay.getPathFriendlyURLPublic() + '/' + siteSlug + '/' + messageObjectRoute + '/' + msg.friendlyUrlPath
+					? sitePrefix + '/' + messageObjectRoute + '/' + msg.friendlyUrlPath
 					: null;
 				if (!topicHref) missingDisplayPage = true;
 
