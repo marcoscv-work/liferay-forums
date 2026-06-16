@@ -280,13 +280,14 @@ if (messageList) {
 					if (preview.length > 160) preview = preview.substring(0, 160) + '...';
 				}
 
-				/* Avatar (Clay sticker) */
-				var avatarColor = avatarColorClass(msg.creator);
+				/* Avatar (Clay sticker). Image stickers use `sticker-user-icon`
+				   (white bg + subtle gray ring); initial-based stickers use
+				   the colored `sticker-outline-N` palette. */
 				var avatarHtml;
 				if (creatorImage) {
-					avatarHtml = '<span class="sticker sticker-circle sticker-lg ' + avatarColor + '"><span class="sticker-overlay"><img class="sticker-img" src="' + Liferay.Util.escapeHTML(creatorImage) + '" alt="' + Liferay.Util.escapeHTML(creatorName) + '"></span></span>';
+					avatarHtml = '<span class="sticker sticker-circle sticker-lg"><span class="sticker-overlay"><img class="sticker-img" src="' + Liferay.Util.escapeHTML(creatorImage) + '" alt="' + Liferay.Util.escapeHTML(creatorName) + '"></span></span>';
 				} else {
-					avatarHtml = '<span class="sticker sticker-circle sticker-lg ' + avatarColor + '"><span class="sticker-overlay">' + avatarInitial(creatorName) + '</span></span>';
+					avatarHtml = '<span class="sticker sticker-circle sticker-lg ' + avatarColorClass(msg.creator) + '"><span class="sticker-overlay">' + avatarInitial(creatorName) + '</span></span>';
 				}
 
 				/* Solved badge */
