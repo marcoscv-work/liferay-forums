@@ -12,6 +12,7 @@
 	data-label-mark-as-answer="${languageUtil.get(locale, "mark-as-answer")}"
 	data-label-delete="${languageUtil.get(locale, "delete")}"
 	data-label-reply="${languageUtil.get(locale, "reply")}"
+	data-label-comment="${languageUtil.get(locale, "comment")}"
 	data-label-delete-reply="${languageUtil.get(locale, "delete-reply")}"
 	data-label-edit-reply="${languageUtil.get(locale, "edit-reply")}"
 	data-label-options="${languageUtil.get(locale, "options")}"
@@ -170,7 +171,7 @@
 			<div class="forums-message-detail__tags" id="forumsDetailOPTags" style="display:none;"></div>
 			<div class="forums-message-detail__post-actions" id="forumsDetailOPActions">
 				<div class="forums-vote" id="forumsDetailOPVote"></div>
-				<button class="btn btn-secondary btn-sm" id="forumsDetailReplyBtn" aria-label="${languageUtil.get(locale, "reply")}"></button>
+				<button class="btn btn-primary" id="forumsDetailReplyBtn" aria-label="${languageUtil.get(locale, "comment")}">${languageUtil.get(locale, "comment")}</button>
 			</div>
 		</div>
 
@@ -197,7 +198,7 @@
 
 		<!-- Topic Navigation -->
 		<div class="forums-message-detail__topic-nav" id="forumsDetailTopicNav">
-			<a href="${forumsHome}" class="forums-message-detail__topic-nav-link" id="forumsDetailAllTopics"><span aria-hidden="true">&laquo; </span>${languageUtil.get(locale, "all-forum-categories")}</a>
+			<a href="${forumsHome}" class="forums-message-detail__topic-nav-link" id="forumsDetailAllTopics">${languageUtil.get(locale, "go-to-x")?replace("{0}", languageUtil.get(locale, "forums"))}</a>
 			<a href="#" class="forums-message-detail__topic-nav-link" id="forumsDetailCategoryLink" style="display:none;"></a>
 		</div>
 

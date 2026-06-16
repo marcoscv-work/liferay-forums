@@ -160,8 +160,12 @@
 		"value": "{\"en_US\": \"View the Solution\"}"
 	},
 	{
-		"key": "all-forum-categories",
-		"value": "{\"en_US\": \"All Forum Categories\"}"
+		"key": "go-to-x",
+		"value": "{\"en_US\": \"Go to {0}\"}"
+	},
+	{
+		"key": "comment",
+		"value": "{\"en_US\": \"Comment\"}"
 	},
 	{
 		"key": "no-message-selected",

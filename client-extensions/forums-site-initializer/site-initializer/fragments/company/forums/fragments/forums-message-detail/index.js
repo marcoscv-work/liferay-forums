@@ -42,9 +42,8 @@ if (messageDetail) {
 	/* HATEOAS: hide write-action buttons by default; show after API confirms permission */
 	if (replyBtn) {
 		replyBtn.style.display = 'none';
-		replyBtn.setAttribute('title', messageDetail.dataset.labelReply || 'Reply');
-		replyBtn.setAttribute('aria-label', messageDetail.dataset.labelReply || 'Reply');
-		replyBtn.innerHTML = `<svg class="lexicon-icon lexicon-icon-reply" role="presentation"><use href="${clayIconsUrl}#reply"></use></svg>`;
+		replyBtn.setAttribute('title', messageDetail.dataset.labelComment || 'Comment');
+		replyBtn.setAttribute('aria-label', messageDetail.dataset.labelComment || 'Comment');
 	}
 	if (flagBtn) flagBtn.style.display = 'none';
 	var breadcrumbCategory = messageDetail.querySelector('#forumsDetailBreadcrumbCategory');
@@ -232,7 +231,7 @@ if (messageDetail) {
 				<div class="autofit-col autofit-col-expand forums-message-detail__reply-content">
 					<div class="forums-message-detail__reply-header">
 						<span class="text-dark font-weight-bold">${Liferay.Util.escapeHTML(name)}</span>
-						${isAuthor ? `<span class="label label-lg forums-message-detail__author-badge">${messageDetail.dataset.labelAuthor || 'Author'}</span>` : ''}
+						${isAuthor ? `<span class="label forums-message-detail__author-badge">${messageDetail.dataset.labelAuthor || 'Author'}</span>` : ''}
 						<span class="text-secondary small">${date}</span>
 						${isSolution ? (function() {
 							var tmpl = messageDetail.dataset.labelAnswerSelectedBy || 'Answer selected by {0}';
@@ -242,7 +241,16 @@ if (messageDetail) {
 					</div>
 					<div class="forums-message-detail__reply-body">${body}</div>
 					<div class="forums-message-detail__reply-actions">
-						${canReply ? `<button class="btn btn-outline-borderless btn-sm" type="button" data-forums-compose data-forums-reply data-forums-message-id="${msg.r_messageReplies_c_forumMessageId}" data-forums-parent-id="${msg.id}">${messageDetail.dataset.labelReply || 'Reply'}</button>` : ''}
+						${canReply ? `<button class="btn btn-outline-primary btn-sm" type="button" data-forums-compose data-forums-reply data-forums-message-id="${msg.r_messageReplies_c_forumMessageId}" data-forums-parent-id="${msg.id}">${messageDetail.dataset.labelReply || 'Reply'}</button>` : ''}
+						${hasOptions ? `<div class="dropdown forums-message-detail__reply-options">
+							<button class="btn btn-monospaced btn-sm btn-outline-borderless btn-outline-secondary dropdown-toggle" type="button" id="forumsReplyOptions_${msg.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="${optionsLabel}" title="${optionsLabel}">
+								<svg class="lexicon-icon lexicon-icon-ellipsis-v" role="presentation"><use href="${clayIconsUrl}#ellipsis-v"></use></svg>
+							</button>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="forumsReplyOptions_${msg.id}">
+								${hasEditAction ? `<a class="dropdown-item forums-edit-reply-btn" href="#" data-message-id="${msg.id}">${messageDetail.dataset.labelEditReply || 'Edit Reply'}</a>` : ''}
+								${hasDeleteAction ? `<a class="dropdown-item text-danger forums-delete-btn" href="#" data-delete-url="${msg.actions['delete'].href}">${messageDetail.dataset.labelDeleteReply || 'Delete Reply'}</a>` : ''}
+							</div>
+						</div>` : ''}
 						<div class="align-items-center d-inline-flex text-secondary forums-vote" data-message-id="${msg.id}">
 							<button class="btn-thumbs-up btn btn-monospaced btn-outline-borderless btn-sm btn-outline-secondary forums-vote__btn forums-vote__btn--up${upActive}" type="button" aria-pressed="${isUpPressed}"${canVote ? ` data-vote-dir="up" data-message-id="${msg.id}"` : ' disabled'} title="${messageDetail.dataset.labelUpvote || 'Upvote'}">
 								<svg class="lexicon-icon lexicon-icon-${upIcon}" role="presentation"><use href="${clayIconsUrl}#${upIcon}"></use></svg>
@@ -253,15 +261,6 @@ if (messageDetail) {
 							</button>
 						</div>
 						${canMarkAnswer ? `<button class="btn btn-sm ${isSolution ? 'btn-success' : 'btn-outline-secondary'} forums-answer-btn" data-answer-message-id="${msg.id}" data-is-answer="${isSolution ? 'true' : 'false'}">${isSolution ? `&#10003; ${messageDetail.dataset.labelAccepted || 'Accepted'}` : (messageDetail.dataset.labelMarkAsAnswer || 'Mark as Answer')}</button>` : ''}
-						${hasOptions ? `<div class="dropdown forums-message-detail__reply-options">
-							<button class="component-action dropdown-toggle" type="button" id="forumsReplyOptions_${msg.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="${optionsLabel}" title="${optionsLabel}">
-								<svg class="lexicon-icon lexicon-icon-ellipsis-v" role="presentation"><use href="${clayIconsUrl}#ellipsis-v"></use></svg>
-							</button>
-							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="forumsReplyOptions_${msg.id}">
-								${hasEditAction ? `<a class="dropdown-item forums-edit-reply-btn" href="#" data-message-id="${msg.id}">${messageDetail.dataset.labelEditReply || 'Edit Reply'}</a>` : ''}
-								${hasDeleteAction ? `<a class="dropdown-item text-danger forums-delete-btn" href="#" data-delete-url="${msg.actions['delete'].href}">${messageDetail.dataset.labelDeleteReply || 'Delete Reply'}</a>` : ''}
-							</div>
-						</div>` : ''}
 					</div>
 				</div>
 			</div>
@@ -869,7 +868,7 @@ if (messageDetail) {
 				/* Also populate the bottom category link */
 				if (categoryLink) {
 					var labelText = (messageDetail.dataset.labelBackToX || 'Back to {0}').replace('{0}', catName);
-					categoryLink.textContent = '\u00ab ' + labelText;
+					categoryLink.textContent = labelText;
 					categoryLink.href = catURL;
 					categoryLink.style.display = '';
 				}
@@ -1030,16 +1029,12 @@ if (messageDetail) {
 					var upvoteTitle = messageDetail.dataset.labelUpvote || 'Upvote';
 					var downvoteTitle = messageDetail.dataset.labelDownvote || 'Downvote';
 					opVoteEl.innerHTML = `
-						<button class="btn-thumbs-up btn btn-outline-borderless btn-sm btn-outline-secondary forums-vote__btn forums-vote__btn--up${opUpActive}" type="button" aria-pressed="${opIsUpPressed}"${canVote ? ` data-vote-dir="up" data-message-id="${opMsg.id}"` : ' disabled'} title="${upvoteTitle}">
-							<span class="inline-item inline-item-before">
-								<svg class="lexicon-icon lexicon-icon-${opUpIcon}" role="presentation"><use href="${clayIconsUrl}#${opUpIcon}"></use></svg>
-							</span>
+						<button class="btn-thumbs-up btn btn-monospaced btn-outline-borderless btn-outline-secondary forums-vote__btn forums-vote__btn--up${opUpActive}" type="button" aria-pressed="${opIsUpPressed}"${canVote ? ` data-vote-dir="up" data-message-id="${opMsg.id}"` : ' disabled'} title="${upvoteTitle}">
+							<svg class="lexicon-icon lexicon-icon-${opUpIcon}" role="presentation"><use href="${clayIconsUrl}#${opUpIcon}"></use></svg>
 						</button>
-						<span class="font-weight-bold p-1 forums-vote__score" data-vote-score="${opMsg.id}">${opScore}</span>
-						<button class="btn-thumbs-down btn btn-outline-borderless btn-sm btn-outline-secondary forums-vote__btn forums-vote__btn--down${opDownActive}" type="button" aria-pressed="${opIsDownPressed}"${canVote ? ` data-vote-dir="down" data-message-id="${opMsg.id}"` : ' disabled'} title="${downvoteTitle}">
-							<span class="inline-item inline-item-before">
-								<svg class="lexicon-icon lexicon-icon-${opDownIcon}" role="presentation"><use href="${clayIconsUrl}#${opDownIcon}"></use></svg>
-							</span>
+						<span class="font-weight-bold mx-2 forums-vote__score" data-vote-score="${opMsg.id}">${opScore}</span>
+						<button class="btn-thumbs-down btn btn-monospaced btn-outline-borderless btn-outline-secondary forums-vote__btn forums-vote__btn--down${opDownActive}" type="button" aria-pressed="${opIsDownPressed}"${canVote ? ` data-vote-dir="down" data-message-id="${opMsg.id}"` : ' disabled'} title="${downvoteTitle}">
+							<svg class="lexicon-icon lexicon-icon-${opDownIcon}" role="presentation"><use href="${clayIconsUrl}#${opDownIcon}"></use></svg>
 						</button>`;
 				}
 
