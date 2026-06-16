@@ -90,6 +90,14 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 	color: var(--blue-d2, #005fcc);
 }
 
+/* Solved banner layout. Uses `display: flex` from a scoped rule instead
+   of Bootstrap's `.d-flex` utility (which is `!important` and would
+   defeat the inline `style="display:none"` we toggle from JS). */
+
+.forums-message-detail__solved-banner {
+	display: flex;
+}
+
 /* OP tag chips: a neutral light-gray fill with near-black text, pairing
    `--secondary-l3` and `--dark-d2` from the Classic theme so the chip
    reads as a quiet categorical marker (not a CTA). */
@@ -137,16 +145,29 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 }
 
 .forums-message-detail__reply-actions {
+	gap: 1rem;
 	margin-top: 0.75rem;
+}
+
+.forums-message-detail__reply-card .forums-vote__btn {
+	border-radius: 50%;
 }
 
 .forums-message-detail__reply-card {
 	padding: 1.25rem 0;
 }
 
+/* Reply marked as the accepted solution: a soft success-tinted card.
+   `--success-l2` provides the pastel green fill from the Classic theme
+   (falls back to its hex equivalent), and `--border-radius-lg` rounds
+   the corners. Padding is set on all sides because the bg fill needs
+   horizontal breathing room (the base reply-card has vertical-only
+   padding). */
+
 .forums-message-detail__reply-card--solution {
-	border-left: 3px solid var(--primary, #0b5fff);
-	padding-left: 1rem;
+	background-color: var(--success-l2, #edf9f0);
+	border-radius: var(--border-radius-lg, 0.5rem);
+	padding: 1.25rem;
 }
 
 
@@ -177,8 +198,22 @@ body.has-edit-mode-menu #forumsDetailReplyERC {
 	margin-bottom: 0.75rem;
 }
 
-.forums-message-detail__section-header--solution {
+/* "Answer selected by [author]" annotation: shown on the accepted reply's
+   header row, pushed to the far right with `margin-left: auto`. Combines
+   Clay's `.small` (matches the date's font-size) with `--success` color
+   from the theme; the author name itself is semibold. */
+
+.forums-message-detail__answer-selected-by {
+	align-items: center;
 	color: var(--success, #287d3c);
+	display: inline-flex;
+	font-weight: 400;
+	gap: 0.25rem;
+	margin-left: auto;
+}
+
+.forums-message-detail__answer-selected-by-name {
+	font-weight: 600;
 }
 
 /* Topic navigation */

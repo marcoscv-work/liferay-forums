@@ -13,6 +13,8 @@
 	data-label-delete="${languageUtil.get(locale, "delete")}"
 	data-label-reply="${languageUtil.get(locale, "reply")}"
 	data-label-delete-reply="${languageUtil.get(locale, "delete-reply")}"
+	data-label-edit-reply="${languageUtil.get(locale, "edit-reply")}"
+	data-label-options="${languageUtil.get(locale, "options")}"
 	data-label-delete-topic="${languageUtil.get(locale, "delete-topic")}"
 	data-label-confirm-delete-reply="${languageUtil.get(locale, "confirm-delete-reply")}"
 	data-label-confirm-delete-topic="${languageUtil.get(locale, "confirm-delete-topic")}"
@@ -21,9 +23,11 @@
 	data-label-unable-to-load-messages="${languageUtil.get(locale, "unable-to-load-messages")}"
 	data-label-flagged="${languageUtil.get(locale, "flagged")}"
 	data-label-reply-form-not-found="${languageUtil.get(locale, "reply-form-not-found")}"
-	data-label-posted-on="${languageUtil.get(locale, "posted-on")}"
+	data-label-posted-on="${languageUtil.get(locale, "posted-on-x", "Posted on {0}")}"
+	data-label-asked-on="${languageUtil.get(locale, "asked-on-x", "Asked on {0}")}"
 	data-label-accepted-solution="${languageUtil.get(locale, "x-accepted-solution")}"
 	data-label-accepted-solutions="${languageUtil.get(locale, "x-accepted-solutions")}"
+	data-label-answer-selected-by="${languageUtil.get(locale, "answer-selected-by-x", "Answer selected by {0}")}"
 	data-label-x-reply="${languageUtil.get(locale, "x-reply")}"
 	data-label-x-replies="${languageUtil.get(locale, "x-replies")}"
 	data-label-convert-to-question="${languageUtil.get(locale, "convert-to-question")}"
@@ -90,7 +94,7 @@
 		</div>
 
 		<!-- Solved indicator -->
-		<div class="alert alert-success d-flex align-items-center forums-message-detail__solved-banner" id="forumsDetailSolvedBanner" style="display:none;" role="alert">
+		<div class="alert alert-success align-items-center forums-message-detail__solved-banner" id="forumsDetailSolvedBanner" style="display:none;" role="alert">
 			<span class="alert-indicator mr-2">
 				<svg class="lexicon-icon lexicon-icon-check-circle-full" role="presentation" width="20" height="20">
 					<use href="${themeDisplay.getPathThemeImages()}/clay/icons.svg#check-circle-full"></use>
@@ -172,12 +176,6 @@
 
 		<!-- Accepted Solution Section -->
 		<div class="forums-message-detail__solution-section" id="forumsDetailSolutionSection" style="display:none;">
-			<h2 class="forums-message-detail__section-header forums-message-detail__section-header--solution">
-				<svg class="lexicon-icon lexicon-icon-check-circle-full" role="presentation" width="18" height="18">
-					<use href="${themeDisplay.getPathThemeImages()}/clay/icons.svg#check-circle-full"></use>
-				</svg>
-				<span id="forumsDetailSolutionCount"></span>
-			</h2>
 			<div id="forumsDetailSolutionCards"></div>
 		</div>
 
