@@ -296,6 +296,18 @@ def _process_message(idx, total, msg_def, msg_date, cat_map, user_sessions, admi
 
     author_session = admin_session  # demo users lack Add permission on the Forum Objects (perms not set via site-initializer JSON)
 
+    # Skip if a message with the same title already exists — keeps the script
+    # re-runnable without producing duplicates.
+    escaped_title = title.replace("'", "''")
+    existing = author_session.get(
+        f"{base}/o/c/forummessages/scopes/{site_id}",
+        params={"filter": f"messageTitle eq '{escaped_title}'", "pageSize": 1},
+    )
+    existing_body = _json(existing)
+    if existing.ok and existing_body and existing_body.get("totalCount", 0) > 0:
+        print(f"  ⏭  [{idx+1}/{total}] Skipping '{title}' — already exists")
+        return 0, 0
+
     # Pre-compute reply dates: OP reply + community replies
     replies_def = msg_def.get("replies", [])
     reply_dates = _generate_reply_dates(msg_date, 1 + len(replies_def))
