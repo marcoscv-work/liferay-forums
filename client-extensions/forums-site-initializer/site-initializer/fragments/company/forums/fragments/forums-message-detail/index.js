@@ -1024,7 +1024,7 @@ if (messageDetail) {
 					var opUpIcon = opUserVote && opUserVote.voteValue === 1 ? 'thumbs-up-full' : 'thumbs-up';
 					var opDownIcon = opUserVote && opUserVote.voteValue === -1 ? 'thumbs-down-full' : 'thumbs-down';
 					
-					opVoteEl.className = 'align-items-center d-inline-flex justify-content-center text-secondary mr-3 forums-vote';
+					opVoteEl.className = 'align-items-center d-inline-flex justify-content-center text-secondary forums-vote';
 					opVoteEl.setAttribute('data-message-id', opMsg.id);
 					var upvoteTitle = messageDetail.dataset.labelUpvote || 'Upvote';
 					var downvoteTitle = messageDetail.dataset.labelDownvote || 'Downvote';
@@ -1173,8 +1173,8 @@ if (messageDetail) {
 				if (repliesSection) repliesSection.style.display = '';
 				if (replyCountEl) {
 					var tmpl = regularReplyCount === 1
-						? (messageDetail.dataset.labelXReply || '{0} reply')
-						: (messageDetail.dataset.labelXReplies || '{0} replies');
+						? (messageDetail.dataset.labelXReply || '{0} comment')
+						: (messageDetail.dataset.labelXReplies || '{0} comments');
 					replyCountEl.textContent = tmpl.replace('{0}', regularReplyCount);
 				}
 

@@ -6,6 +6,10 @@
    clamping, inline icon alignment) plus the bespoke loading skeleton — none of
    them hard-code brand colors. */
 
+.forums-message-list {
+	margin-bottom: var(--spacer-7, 6rem);
+}
+
 /* Header */
 
 .forums-message-list__header {
