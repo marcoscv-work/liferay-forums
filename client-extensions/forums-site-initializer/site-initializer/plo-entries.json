@@ -284,12 +284,12 @@
 		"value": "{\"en_US\": \"Solved\"}"
 	},
 	{
-		"key": "x-reply-singular",
-		"value": "{\"en_US\": \"{0} reply\"}"
+		"key": "x-reply",
+		"value": "{\"en_US\": \"{0} comment\"}"
 	},
 	{
-		"key": "x-replies-plural",
-		"value": "{\"en_US\": \"{0} replies\"}"
+		"key": "x-replies",
+		"value": "{\"en_US\": \"{0} comments\"}"
 	},
 	{
 		"key": "just-now",
