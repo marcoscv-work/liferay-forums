@@ -7,16 +7,16 @@
    top edge. */
 
 .forums-related-topics {
-	margin-top: 5px;
+	margin-top: var(--spacer-1, 0.25rem);
 }
 
 /* The previous Clay `panel-title` class on the heading enforced an UPPERCASE
    text-transform and a 0.875rem font-size; this rule replaces it with a
-   plain title-case heading at 1.25rem (20px). */
+   plain title-case heading at lead size. */
 
 .forums-related-topics__heading {
-	font-size: 1.25rem;
-	margin-bottom: 1.5rem;
+	font-size: var(--lead-font-size, 1.25rem);
+	margin-bottom: var(--spacer-4, 1.5rem);
 }
 
 /* List items: drop the dividers and the hover background so each row reads

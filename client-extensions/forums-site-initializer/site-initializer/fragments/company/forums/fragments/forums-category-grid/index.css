@@ -6,7 +6,7 @@
 }
 
 .forums-category-grid > .container > h2 {
-	font-size: 2rem;
+	font-size: var(--h1-font-size, 2rem);
 }
 
 .forums-category-grid__card-icon {
@@ -14,21 +14,15 @@
 	color: var(--blue-d4, #001a3d);
 }
 
-@media (min-width: 576px) {
-	.forums-category-grid__card {
-		min-height: 288px;
-	}
-}
 
 .forums-category-grid__card .card-title {
-	font-size: 20px;
+	font-size: var(--lead-font-size, 1.25rem);
 }
 
 .forums-category-grid__card-desc {
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	display: -webkit-box;
-	font-size: 16px;
 	margin-bottom: 0;
 	overflow: hidden;
 }
