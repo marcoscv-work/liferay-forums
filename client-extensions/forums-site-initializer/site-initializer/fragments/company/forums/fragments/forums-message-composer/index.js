@@ -39,29 +39,40 @@ if (messageComposer) {
 	var bodyEditorInstance = null;
 
 	var editorPromise = new Promise(function(resolve) {
-		if (Liferay.FeatureFlags && Liferay.FeatureFlags['LPD-11235']) {
-			Liferay.on('ckeditor:ready', function(event) {
-				var editor = event.editor;
-				if (editorName === editor.config.get('name')) {
-					resolve(editor);
+		function matchesName(editor) {
+			if (!editor) {
+				return false;
+			}
+			var name = editor.name ||
+				(editor.config && (typeof editor.config.get === 'function') &&
+					editor.config.get('name'));
+			return name === editorName;
+		}
+
+		/* Resolve as soon as the editor is ready, regardless of which editor
+		   the server actually rendered. The LPD-11235 client flag and the
+		   rendered editor can disagree (e.g. the flag is toggled at runtime
+		   without restarting the server, so the server still renders the
+		   legacy editor while the client behaves as if CKEditor 5 is active).
+		   To stay correct either way we listen for BOTH the CKEditor 5
+		   "ckeditor:ready" event and the legacy CKEditor "instanceReady"
+		   event, and also resolve an instance that is already ready. */
+		Liferay.on('ckeditor:ready', function(event) {
+			if (matchesName(event && event.editor)) {
+				resolve(event.editor);
+			}
+		});
+
+		if (window.CKEDITOR) {
+			if (CKEDITOR.instances && CKEDITOR.instances[editorName]) {
+				resolve(CKEDITOR.instances[editorName]);
+			}
+
+			CKEDITOR.on('instanceReady', function(event) {
+				if (matchesName(event && event.editor)) {
+					resolve(event.editor);
 				}
 			});
-		} else {
-			if (window.CKEDITOR) {
-				CKEDITOR.on('instanceReady', function(event) {
-					var editor = event.editor;
-					if (editor.name === editorName) {
-						resolve(editor);
-					}
-				});
-			} else {
-				Liferay.on('ckeditor:ready', function(event) {
-					var editor = event.editor;
-					if (editorName === editor.name || editorName === (editor.config && editor.config.get('name'))) {
-						resolve(editor);
-					}
-				});
-			}
 		}
 	});
 
@@ -76,6 +87,27 @@ if (messageComposer) {
 			console.warn('Could not resize CKEditor', e);
 		}
 	});
+
+	/* Read the editor content defensively: if the editor promise has not
+	   resolved (e.g. the rendered editor and the LPD-11235 flag disagree),
+	   fall back to the legacy CKEditor instance or the underlying textarea so
+	   the body is never reported as empty when the user has typed something. */
+	function getEditorData() {
+		if (bodyEditorInstance && (typeof bodyEditorInstance.getData === 'function')) {
+			return bodyEditorInstance.getData() || '';
+		}
+		if (window.CKEDITOR && CKEDITOR.instances &&
+			CKEDITOR.instances[editorName] &&
+			(typeof CKEDITOR.instances[editorName].getData === 'function')) {
+
+			return CKEDITOR.instances[editorName].getData() || '';
+		}
+		var textarea = document.getElementById(editorName);
+		if (textarea && (typeof textarea.value === 'string')) {
+			return textarea.value;
+		}
+		return '';
+	}
 
 	/* Detect mode from URL */
 	var urlParams = new URLSearchParams(window.location.search);
@@ -184,23 +216,31 @@ if (messageComposer) {
 	function showModal() {
 		_modalTrigger = document.activeElement;
 		if (modal) {
-			modal.classList.add('is-visible');
+			modal.style.display = 'block';
+			modal.classList.add('show');
 			modal.setAttribute('aria-hidden', 'false');
 		}
-		if (backdrop) backdrop.classList.add('is-visible');
-		document.body.style.overflow = 'hidden';
-		/* Move focus to the first focusable element inside the dialog */
-		var focusable = modal && modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-		if (focusable) focusable.focus();
+		if (backdrop) {
+			backdrop.style.display = 'block';
+			backdrop.classList.add('show');
+		}
+		document.body.classList.add('modal-open');
+		/* Move focus into the dialog itself (not the close button) so screen
+		   readers announce the modal and Esc/Tab work from a neutral start. */
+		if (modal) modal.focus();
 	}
 
 	function hideModal() {
 		if (modal) {
-			modal.classList.remove('is-visible');
+			modal.classList.remove('show');
+			modal.style.display = 'none';
 			modal.setAttribute('aria-hidden', 'true');
 		}
-		if (backdrop) backdrop.classList.remove('is-visible');
-		document.body.style.overflow = '';
+		if (backdrop) {
+			backdrop.classList.remove('show');
+			backdrop.style.display = 'none';
+		}
+		document.body.classList.remove('modal-open');
 		resetForm();
 		/* Return focus to the element that opened the modal */
 		if (_modalTrigger && typeof _modalTrigger.focus === 'function') {
@@ -239,7 +279,7 @@ if (messageComposer) {
 
 	/* Close on Escape key */
 	document.addEventListener('keydown', function(e) {
-		if (e.key === 'Escape' && modal && modal.classList.contains('is-visible')) {
+		if (e.key === 'Escape' && modal && modal.classList.contains('show')) {
 			hideModal();
 		}
 	});
@@ -373,6 +413,10 @@ if (messageComposer) {
 			var composeMessageId = trigger.getAttribute('data-forums-message-id') || messageId;
 			var composeCategoryId = trigger.getAttribute('data-forums-category-id') || categoryIdParam;
 			var composeMessageId = trigger.getAttribute('data-forums-message-id') || null;
+			/* For a reply to another reply, the root ForumMessage id is the
+			   foreign key (data-forums-message-id) and the reply being answered
+			   is the threading parent (data-forums-parent-id). */
+			var composeParentId = trigger.getAttribute('data-forums-parent-id') || composeMessageId;
 			var rawTags = trigger.getAttribute('data-forums-tags');
 			var parsedTags = [];
 			if (rawTags) {
@@ -381,7 +425,7 @@ if (messageComposer) {
 			window.forumsOpenComposeModal({
 				messageId: trigger.hasAttribute('data-forums-reply') ? composeMessageId : null,
 				categoryId: composeCategoryId,
-				parentMessageId: composeMessageId,
+				parentMessageId: composeParentId,
 				tags: parsedTags
 			});
 		}
@@ -431,11 +475,8 @@ if (messageComposer) {
 			if (successAlert) successAlert.style.display = 'none';
 			if (errorAlert) errorAlert.style.display = 'none';
 
-			var body = '';
-			if (bodyEditorInstance) {
-				body = bodyEditorInstance.getData() || '';
-			}
-			
+			var body = getEditorData();
+
 			/* Strip HTML to check if it's completely empty */
 			var tempDiv = document.createElement('div');
 			tempDiv.innerHTML = body;
